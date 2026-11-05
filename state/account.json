@@ -1,0 +1,16 @@
+{
+ "equity": 100000,
+ "peak": 100000,
+ "day": "",
+ "day_start_equity": 100000,
+ "week_start_equity": 100000,
+ "entries_today": 0,
+ "open_structures": 0,
+ "consecutive_losses": 0,
+ "cooldown_until_expiry": "",
+ "halted": false,
+ "halt_reason": "",
+ "trade_returns": [],
+ "paper_trades": 0,
+ "mode": "paper"
+}

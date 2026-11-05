@@ -1,0 +1,46 @@
+# KAVACH hard limits. The governor enforces these on EVERY order. A strategy, a script or an
+# AI agent can only TIGHTEN them. Loosening requires `python -m kavach.cli limits accept`
+# run by a human, a typed confirmation, and takes effect the NEXT trading day.
+
+[account]
+capital_base = 100000          # rupees the system is allowed to treat as its account
+
+[per_trade]
+risk_per_trade = 0.06          # target worst-case loss per structure, as fraction of equity
+max_loss_pct = 0.15            # absolute ceiling on worst-case loss of one structure
+max_lots = 2
+
+[daily]
+# Set >= per_trade.max_loss_pct ON PURPOSE. A defined-risk structure can't lose more than its
+# worst case; a tighter daily stop silently converts 'hold to expiry' into a stop-loss strategy,
+# which the backtest shows is worse (stops get hit by intraday noise). This limit exists to catch
+# what should be impossible: a naked leg, a failed unwind, a fat-finger. Breach => flatten + halt day.
+max_loss_pct = 0.16
+max_entries = 2
+
+[weekly]
+max_loss_pct = 0.16            # breach => no new entries until next expiry cycle
+
+[drawdown]
+half_size_at = -0.10
+halt_at = -0.20                # breach => halted until a human runs `kavach.cli reset-halt`
+
+[behaviour]
+max_consecutive_losses = 3     # then sit out one full expiry cycle (anti-revenge-trading)
+max_open_structures = 1
+
+[orders]
+limit_only = true
+max_orders_per_sec = 5         # SEBI retail-algo threshold is 10/sec; stay well under
+max_price_dev = 0.03           # limit price must be within 3% (or Rs 2) of the quoted bid/ask
+entry_window = ["09:45", "14:30"]
+flatten_on_expiry_by = "15:10"
+
+[structure]
+defined_risk_only = true       # every short option must be covered by a long further OTM
+allowed_underlyings = ["NIFTY"]
+max_days_to_expiry = 8
+
+[mode]
+paper_trades_required_for_live = 20
+approval = "manual"            # "manual": every entry needs a human y/N. "auto": no prompt.

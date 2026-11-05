@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KAVACH · control room</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M16 2 4 7v9c0 7 5 12 12 14 7-2 12-7 12-14V7z' fill='%232f6f9f'/></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2 4 7v9c0 7 5 12 12 14 7-2 12-7 12-14V7z"/></svg>
+    <div><h1>KAVACH</h1><span class="sub">Nifty weekly options · risk-first</span></div>
+  </div>
+  <div class="pills" id="pills"></div>
+</header>
+
+<div id="banners"></div>
+
+<main>
+  <section class="kpis" id="kpis"></section>
+
+  <section class="grid2">
+    <article class="card" id="signalCard">
+      <h2>Market signal</h2>
+      <div id="signal" class="muted">Loading…</div>
+    </article>
+    <article class="card" id="controlsCard">
+      <h2>Controls</h2>
+      <div class="controls">
+        <button data-cmd="step" class="btn">Run a step now</button>
+        <button data-cmd="pause" class="btn" id="pauseBtn">Pause entries</button>
+        <button data-cmd="resume" class="btn" id="resumeBtn">Resume</button>
+        <button data-cmd="flatten" class="btn danger" data-confirm="Close the open position at market quotes?">Flatten position</button>
+      </div>
+      <details class="adv">
+        <summary>Human-only actions</summary>
+        <p class="muted small">These need today's date typed exactly, as the governor requires.</p>
+        <div class="row">
+          <button class="btn" id="resetHalt">Reset drawdown halt</button>
+          <button class="btn" id="acceptLimits">Accept edited limits.toml</button>
+        </div>
+      </details>
+      <p class="muted small" id="cmdHint"></p>
+      <div id="cmdStatus" class="small"></div>
+    </article>
+  </section>
+
+  <section id="proposalWrap"></section>
+  <section id="positionWrap"></section>
+
+  <section class="grid2">
+    <article class="card">
+      <h2>Equity <span class="muted small" id="eqNote"></span></h2>
+      <div id="equityChart" class="chart"></div>
+    </article>
+    <article class="card">
+      <h2>IV calibration <span class="muted small">live ATM IV ÷ India VIX</span></h2>
+      <div id="calib"></div>
+    </article>
+  </section>
+
+  <article class="card">
+    <h2>Trade journal</h2>
+    <div id="journal" class="tablewrap"></div>
+  </article>
+
+  <section class="grid2">
+    <article class="card">
+      <h2>Engine log</h2>
+      <pre id="log" class="log"></pre>
+    </article>
+    <article class="card">
+      <h2>Rules in force</h2>
+      <div id="limits"></div>
+      <p class="small"><a href="report.html" target="_blank" rel="noopener">Research report →</a> · <a id="repoLink" target="_blank" rel="noopener">Repository &amp; command history →</a></p>
+    </article>
+  </section>
+
+  <article class="card">
+    <details id="settings">
+      <summary><h2 class="inline">Settings: one-click control (optional)</h2></summary>
+      <p class="small">Every control files a GitHub issue titled <code>kavach: &lt;command&gt;</code> on your repository. The runner obeys only issues opened by the repository owner, then comments the result and closes the issue.</p>
+      <p class="small"><b>Without a token</b>, a button opens GitHub's new-issue page with the title pre-filled; press <i>Submit</i>. <b>With a token</b>, the button files the issue directly. Use a <i>fine-grained</i> token limited to this one repository, with only <i>Issues: Read and write</i>. It's stored only in this browser.</p>
+      <form class="row" onsubmit="return false">
+        <input id="tokenInput" type="password" placeholder="github_pat_…" autocomplete="off">
+        <button class="btn" id="saveToken" type="button">Save</button>
+        <button class="btn" id="clearToken" type="button">Forget</button>
+      </form>
+      <p class="small muted" id="tokenState"></p>
+    </details>
+  </article>
+</main>
+
+<footer class="muted small">
+  Paper trading runs on GitHub Actions every ~15 min in market hours (GitHub may delay scheduled runs). Live orders need your static-IP machine; see README.
+  <span id="updatedFoot"></span>
+</footer>
+
+<div id="modal" class="modal" hidden>
+  <div class="modal-box">
+    <h3 id="modalTitle"></h3>
+    <p id="modalText" class="small"></p>
+    <input id="modalInput" type="text" autocomplete="off">
+    <div class="row end">
+      <button class="btn" id="modalCancel">Cancel</button>
+      <button class="btn primary" id="modalOk">Send</button>
+    </div>
+  </div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
