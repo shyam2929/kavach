@@ -1,0 +1,8 @@
+__pycache__/
+.pytest_cache/
+.venv/
+.upstox_token
+.env
+state/*
+!state/trials.jsonl
+data/nifty_5m.csv

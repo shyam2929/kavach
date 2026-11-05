@@ -1,0 +1,46 @@
+# Paper-trading runner. Every ~15 min in market hours (and on every command issue you open),
+# it runs ONE engine step, then publishes state + dashboard to the gh-pages branch.
+# It can never trade live: kavach.cli refuses --live under GitHub Actions.
+name: engine
+on:
+  schedule:
+    - cron: "*/15 3-10 * * 1-5"      # 08:30-16:15 IST; the engine itself checks the 09:15-15:30 session
+  issues:
+    types: [opened]
+  workflow_dispatch:
+concurrency:
+  group: pages-state
+  cancel-in-progress: false
+permissions:
+  contents: write
+  issues: write
+jobs:
+  step:
+    if: >-
+      github.event_name != 'issues' ||
+      (github.event.issue.user.login == github.repository_owner && startsWith(github.event.issue.title, 'kavach:'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with: { ref: gh-pages, path: pages }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: pip }
+      - run: pip install -r requirements.txt
+      - name: engine step
+        env:
+          KAVACH_STATE: pages/state
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          UPSTOX_ANALYTICS_TOKEN: ${{ secrets.UPSTOX_ANALYTICS_TOKEN }}
+        run: python -m kavach.cli step --site pages --github-commands --strategy fly_hold
+      - name: publish dashboard
+        run: |
+          cp site/index.html site/app.js site/style.css pages/
+          touch pages/.nojekyll
+          cd pages
+          git config user.name "kavach-bot"
+          git config user.email "kavach-bot@users.noreply.github.com"
+          git add -A
+          git commit -qm "engine step $(date -u +%FT%TZ)" || echo "nothing to commit"
+          git push -q
