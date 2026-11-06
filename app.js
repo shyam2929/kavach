@@ -70,10 +70,11 @@
     const pills = [];
     pills.push(s.mode === "LIVE" ? `<span class="pill live">LIVE</span>` : `<span class="pill">PAPER</span>`);
     pills.push(`<span class="pill ${s.quotes === "upstox" || s.quotes === "upstox-live" ? "ok" : "warn"}">quotes: ${esc(s.quotes)}</span>`);
-    pills.push(`<span class="pill ${s.market_open ? "ok" : ""}">${s.market_open ? "market open" : "market closed"}</span>`);
+    pills.push(`<span class="pill ${s.market_open ? "ok" : ""}">NSE ${s.market_open ? "open" : "closed"}</span>`);
     pills.push(`<span class="pill">${esc(s.strategy)}</span>`);
     pills.push(`<span class="pill">approval: ${esc(s.approval)}</span>`);
     if (s.training) pills.push(`<span class="pill ok">training book on</span>`);
+    if (s.crude) pills.push(`<span class="pill ${s.crude.mcx_open ? "ok" : ""}">MCX ${s.crude.mcx_open ? "open" : "closed"}</span>`);
     pills.push(`<span class="pill" title="${esc(s.updated)}">updated ${ago(s.updated)}</span>`);
     $("#pills").innerHTML = pills.join("");
 
@@ -81,6 +82,7 @@
     if (s.halted) b.push(`<div class="banner bad"><b>HALTED</b><span>${esc(s.halt_reason)}. No new entries until you reset the halt (Controls → human-only).</span></div>`);
     if (s.paused) b.push(`<div class="banner warn"><b>Paused</b><span>New entries are paused. Open positions are still managed.</span></div>`);
     if (s.training && s.training.pending) b.push(`<div class="banner info"><b>Trade to accept</b><span>Training trade ${esc(s.training.pending.id)}: ${esc(s.training.pending.strategy)} ×1, expiry ${esc(s.training.pending.expiry)}, worst case ${inr(s.training.pending.max_loss)}. See the Training book below.</span></div>`);
+    if (s.crude && s.crude.pending) for (const [bk, p] of Object.entries(s.crude.pending)) b.push(`<div class="banner info"><b>Crude trade to accept</b><span>${bk === "main" ? "Main" : "Training"} ${esc(p.id)}: condor ×1 Mini lot, options expiry ${esc(p.expiry)}, worst case ${inr(p.max_loss)}. See the Crude section.</span></div>`);
     if (s.pending) b.push(`<div class="banner info"><b>Proposal waiting</b><span>${esc(s.pending.strategy)} ×${s.pending.lots}, worst case ${inr(s.pending.max_loss)}. Review below.</span></div>`);
     if (s.quotes === "synthetic") b.push(`<div class="banner warn"><b>Synthetic quotes</b><span>Option prices are modelled from Nifty and VIX. Add the <code>UPSTOX_ANALYTICS_TOKEN</code> repository secret to paper-trade on real Upstox quotes (see README).</span></div>`);
     $("#banners").innerHTML = b.join("");
@@ -160,6 +162,7 @@
         </div><div class="chart">${payoffChart(pos.payoff, s.signal && s.signal.spot)}<div class="muted small">P&amp;L at expiry vs Nifty</div></div></div></article>`;
     } else $("#positionWrap").innerHTML = `<article class="card"><h2>Main account position</h2><div class="empty">Flat. ${esc(s.note || "")}</div></article>`;
     $("#trainingWrap").innerHTML = trainingSection(s);
+    $("#crudeWrap").innerHTML = crudeSection(s);
 
     // calibration
     const c = s.iv_calibration || { n: 0 };
@@ -227,6 +230,64 @@
         </div><div class="chart">${payoffChart(pos.payoff, s.signal && s.signal.spot)}</div></div></div>`;
     }
     if (!p && !t.positions.length) h += `<div class="empty">No training proposal right now. One is made each trading day from 09:45 IST.</div>`;
+    return h + "</article>";
+  }
+
+  function crudeSection(s) {
+    const c = s.crude;
+    if (!c) return "";
+    const g = c.signal || {};
+    const sess = c.session ? `${c.session[0]}–${c.session[1]} IST` : "closed today";
+    const jr = [...(c.journals.main || []), ...(c.journals.training || [])];
+    const realized = jr.reduce((a, r) => a + (+r.pnl || 0), 0);
+    let h = `<article class="card"><h2>Crude oil · MCX Crude Oil Mini options <span class="muted small">${c.mcx_open ? "MCX open" : "MCX closed"} · session ${esc(sess)} · quotes: ${esc(c.quotes)}</span></h2>
+      <div class="sig">
+        <div><div class="l">MCX crude (≈ WTI × ₹)</div><div class="v">₹${num(g.mcx, 0)}</div></div>
+        <div><div class="l">WTI · USD/INR</div><div class="v">$${num(g.wti, 2)} · ${num(g.inr, 2)}</div></div>
+        <div><div class="l">OVX (crude implied vol)</div><div class="v">${num(g.ovx)}</div></div>
+      </div>
+      <div class="gate">
+        <div class="g"><span><span class="dot ${g.ovx_ch5 <= 0.15 ? "ok" : "bad"}"></span>OVX 5-day change <span class="muted small">(≤ +15%)</span></span><span>${pct(g.ovx_ch5)}</span></div>
+        <div class="g"><span><span class="dot ${g.ret5 >= -0.05 ? "ok" : "bad"}"></span>Crude 5-day return <span class="muted small">(≥ −5%)</span></span><span>${pct(g.ret5)}</span></div>
+        <div class="g"><span><span class="dot ${g.dd20 >= -0.10 ? "ok" : "bad"}"></span>Below 20-day high <span class="muted small">(≥ −10%)</span></span><span>${pct(g.dd20)}</span></div>
+        <div class="g"><span><span class="dot ${g.ovx <= 70 ? "ok" : "bad"}"></span>OVX level <span class="muted small">(≤ 70)</span></span><span>${num(g.ovx)}</span></div>
+      </div>
+      <div class="verdict">${g.stress ? `<b class="neg">Stress regime.</b> The main crude book is blocked (${esc((g.stress_reasons || []).join("; "))}). Training trades are still offered, labelled.` : `<b class="pos">Gate open.</b> The main crude book may propose a monthly condor.`}
+        <div class="muted small">Daily data as of ${esc(g.asof)} · main-book paper cycles: ${c.paper_trades}/20 · closed crude trades: ${jr.length}, realized ${inr(realized)}</div></div>`;
+    for (const [book, p] of Object.entries(c.pending || {})) {
+      h += `<div class="card" style="margin-top:12px"><h2>${book === "main" ? "Main" : "Training"} crude proposal ${esc(p.id)} <span class="muted small">valid until ${esc(p.valid_until.slice(11))} IST · options expiry ${esc(p.expiry)} (${p.td_left} trading days) · 1 Mini lot = 10 bbl</span></h2>
+        <div class="split"><div>
+          ${legTable(p.legs.map((l) => ({ ...l, entry: l.limit, lots: 1 })), false)}
+          <div class="facts">
+            <div><div class="l">Net credit</div><div class="v">${inr(p.credit)}</div></div>
+            <div><div class="l">Worst case</div><div class="v neg">${inr(p.max_loss)}</div></div>
+            <div><div class="l">ATM IV · futures</div><div class="v">${num(p.atm_iv * 100)} · ${num(p.spot, 0)}</div></div>
+            <div><div class="l">Gates say</div><div class="v ${p.gate_open ? "pos" : "neg"}">${p.gate_open ? "trade" : "skip"}</div></div>
+          </div>
+          <p class="small">${p.gate_open ? "Gates open." : `Gates say skip (${esc(p.gate_reason)}). Offered as training data.`} Closed automatically from 17:00 IST two trading days before options expiry, so nothing turns into futures.</p>
+          <div class="row">
+            <button class="btn good" data-cmd="approve" data-arg="${esc(p.id)}" data-confirm="Open crude ${book} trade ${esc(p.id)} (1 Mini lot, paper)? Worst case ${inr(p.max_loss)}.">Accept trade</button>
+            <button class="btn" data-cmd="reject" data-arg="${esc(p.id)}">Skip today</button>
+          </div>
+        </div><div class="chart">${payoffChart(p.payoff, p.spot)}<div class="muted small">P&amp;L at expiry vs MCX crude (₹/bbl)</div></div></div></div>`;
+    }
+    for (const pos of c.positions || []) {
+      h += `<div class="card" style="margin-top:12px"><h2>${esc(pos.id)} · crude ${esc(pos.book)} ×1 <span class="muted small">opened ${esc(pos.opened)} · options expiry ${esc(pos.expiry)} · ${pos.gate_open ? "gates open" : esc(pos.gate_reason)}</span></h2>
+        <div class="split"><div>${legTable(pos.legs, true)}
+          <div class="facts">
+            <div><div class="l">MTM</div><div class="v ${cls(pos.mtm)}">${inr(pos.mtm)}</div></div>
+            <div><div class="l">Credit</div><div class="v">${inr(pos.credit)}</div></div>
+            <div><div class="l">Target</div><div class="v">${inr(pos.tp_rs)}</div></div>
+            <div><div class="l">Worst case</div><div class="v neg">${inr(-pos.max_loss)}</div></div>
+          </div>
+          <button class="btn danger" data-cmd="flatten" data-arg="${esc(pos.id)}" data-confirm="Close crude trade ${esc(pos.id)} now?">Close this trade</button>
+        </div><div class="chart">${payoffChart(pos.payoff, g.mcx)}</div></div></div>`;
+    }
+    if (!Object.keys(c.pending || {}).length && !(c.positions || []).length) h += `<div class="empty">No crude proposal right now. Proposals come each MCX day from 10:00 to 22:00 IST (none on Wednesdays after 18:00, the EIA window).</div>`;
+    if (jr.length) {
+      const cols = ["closed", "id", "book", "expiry", "credit", "max_loss", "pnl", "reason", "gate_reason"];
+      h += `<h2 style="margin-top:14px">Crude journal</h2><div class="tablewrap"><table><thead><tr>${cols.map((x) => `<th>${x.replace("_", " ")}</th>`).join("")}</tr></thead><tbody>${jr.slice().reverse().map((r) => `<tr>${cols.map((x) => `<td class="${x === "pnl" ? cls(+r[x]) : ""}">${["credit", "max_loss", "pnl"].includes(x) ? inr(+r[x]) : esc(r[x])}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+    }
     return h + "</article>";
   }
 

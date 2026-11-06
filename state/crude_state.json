@@ -1,0 +1,24 @@
+{
+ "pending": {},
+ "positions": [],
+ "last_day": {},
+ "paused": false,
+ "signal": {
+  "asof": "2026-11-06",
+  "ovx": 58.91999816894531,
+  "ovx_ch5": 0.007495752903638698,
+  "ret5": -0.15427071833432737,
+  "dd20": -0.14296002683091635,
+  "wti": 90.43000030517578,
+  "inr": 93.8949966430664,
+  "mcx": 8490.924575086974,
+  "stress": true,
+  "stress_reasons": [
+   "crude -15.4% in 5 days",
+   "crude -14.3% below 20-day high"
+  ]
+ },
+ "last_step": "2026-11-06T23:05:12+05:30",
+ "last_reason": {},
+ "paper_trades": 0
+}
