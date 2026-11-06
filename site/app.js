@@ -73,12 +73,14 @@
     pills.push(`<span class="pill ${s.market_open ? "ok" : ""}">${s.market_open ? "market open" : "market closed"}</span>`);
     pills.push(`<span class="pill">${esc(s.strategy)}</span>`);
     pills.push(`<span class="pill">approval: ${esc(s.approval)}</span>`);
+    if (s.training) pills.push(`<span class="pill ok">training book on</span>`);
     pills.push(`<span class="pill" title="${esc(s.updated)}">updated ${ago(s.updated)}</span>`);
     $("#pills").innerHTML = pills.join("");
 
     const b = [];
     if (s.halted) b.push(`<div class="banner bad"><b>HALTED</b><span>${esc(s.halt_reason)}. No new entries until you reset the halt (Controls → human-only).</span></div>`);
     if (s.paused) b.push(`<div class="banner warn"><b>Paused</b><span>New entries are paused. Open positions are still managed.</span></div>`);
+    if (s.training && s.training.pending) b.push(`<div class="banner info"><b>Trade to accept</b><span>Training trade ${esc(s.training.pending.id)}: ${esc(s.training.pending.strategy)} ×1, expiry ${esc(s.training.pending.expiry)}, worst case ${inr(s.training.pending.max_loss)}. See the Training book below.</span></div>`);
     if (s.pending) b.push(`<div class="banner info"><b>Proposal waiting</b><span>${esc(s.pending.strategy)} ×${s.pending.lots}, worst case ${inr(s.pending.max_loss)}. Review below.</span></div>`);
     if (s.quotes === "synthetic") b.push(`<div class="banner warn"><b>Synthetic quotes</b><span>Option prices are modelled from Nifty and VIX. Add the <code>UPSTOX_ANALYTICS_TOKEN</code> repository secret to paper-trade on real Upstox quotes (see README).</span></div>`);
     $("#banners").innerHTML = b.join("");
@@ -156,7 +158,8 @@
           </div>
           <button class="btn danger" data-cmd="flatten" data-confirm="Close the whole position now at market quotes?">Flatten now</button>
         </div><div class="chart">${payoffChart(pos.payoff, s.signal && s.signal.spot)}<div class="muted small">P&amp;L at expiry vs Nifty</div></div></div></article>`;
-    } else $("#positionWrap").innerHTML = `<article class="card"><h2>Open position</h2><div class="empty">Flat. ${esc(s.note || "")}</div></article>`;
+    } else $("#positionWrap").innerHTML = `<article class="card"><h2>Main account position</h2><div class="empty">Flat. ${esc(s.note || "")}</div></article>`;
+    $("#trainingWrap").innerHTML = trainingSection(s);
 
     // calibration
     const c = s.iv_calibration || { n: 0 };
@@ -182,6 +185,51 @@
     wireButtons();
   }
 
+  function trainingSection(s) {
+    const t = s.training;
+    if (!t) return "";
+    const p = t.pending;
+    let h = `<article class="card"><h2>Training book <span class="muted small">one 1-lot trade proposed every trading day; gates are recorded, not enforced</span></h2>
+      <div class="facts">
+        <div><div class="l">Open trades</div><div class="v">${t.positions.length}</div></div>
+        <div><div class="l">Open MTM</div><div class="v ${cls(t.open_mtm)}">${inr(t.open_mtm)}</div></div>
+        <div><div class="l">Closed · win rate</div><div class="v">${t.closed} · ${t.win_rate == null ? "–" : pct(t.win_rate, 0)}</div></div>
+        <div><div class="l">Realized P&amp;L</div><div class="v ${cls(t.realized)}">${inr(t.realized)}</div></div>
+      </div>
+      ${Object.keys(t.by_gate || {}).length ? `<p class="small">Gate study so far: ${Object.entries(t.by_gate).map(([k, v]) => `<b>${esc(k)}</b> ${v.n} trades, avg ${inr(v.avg)}`).join(" · ")}</p>` : ""}`;
+    if (p) {
+      h += `<div class="card" style="margin-top:12px"><h2>Training proposal ${esc(p.id)} <span class="muted small">made ${ago(p.created)} · valid until ${esc(p.valid_until.slice(11))} IST · expiry ${esc(p.expiry)} (${p.td_left} trading days)</span></h2>
+        <div class="split"><div>
+          ${legTable(p.legs.map((l) => ({ ...l, entry: l.limit })), false)}
+          <div class="facts">
+            <div><div class="l">Net credit</div><div class="v">${inr(p.credit)}</div></div>
+            <div><div class="l">Worst case</div><div class="v neg">${inr(p.max_loss)}</div></div>
+            <div><div class="l">ATM IV · spot</div><div class="v">${num(p.atm_iv * 100)} · ${num(p.spot, 0)}</div></div>
+            <div><div class="l">Gates say</div><div class="v ${p.gate_open ? "pos" : "neg"}">${p.gate_open ? "trade" : "skip"}</div></div>
+          </div>
+          <p class="small">${p.gate_open ? "The main system would also take this trade." : `The main system would <b>not</b> trade here (${esc(p.gate_reason)}). It's still offered as training data.`}</p>
+          <div class="row">
+            <button class="btn good" data-cmd="approve" data-arg="${esc(p.id)}" data-confirm="Open training trade ${esc(p.id)}: ${esc(p.strategy)} ×1 on the ${esc(p.expiry)} expiry? Paper money; worst case ${inr(p.max_loss)}.">Accept trade</button>
+            <button class="btn" data-cmd="reject" data-arg="${esc(p.id)}">Skip today</button>
+          </div>
+        </div><div class="chart">${payoffChart(p.payoff, p.spot)}<div class="muted small">P&amp;L at expiry vs Nifty</div></div></div></div>`;
+    }
+    for (const pos of t.positions) {
+      h += `<div class="card" style="margin-top:12px"><h2>${esc(pos.id)} · ${esc(pos.strategy)} ×${pos.lots} <span class="muted small">opened ${esc(pos.opened)} · expiry ${esc(pos.expiry)} · ${pos.gate_open ? "gates open" : esc(pos.gate_reason)}</span></h2>
+        <div class="split"><div>${legTable(pos.legs, true)}
+          <div class="facts">
+            <div><div class="l">MTM</div><div class="v ${cls(pos.mtm)}">${inr(pos.mtm)}</div></div>
+            <div><div class="l">Credit</div><div class="v">${inr(pos.credit)}</div></div>
+            <div><div class="l">Target</div><div class="v">${inr(pos.tp_rs)}</div></div>
+            <div><div class="l">Worst case</div><div class="v neg">${inr(-pos.max_loss)}</div></div>
+          </div>
+          <button class="btn danger" data-cmd="flatten" data-arg="${esc(pos.id)}" data-confirm="Close training trade ${esc(pos.id)} now?">Close this trade</button>
+        </div><div class="chart">${payoffChart(pos.payoff, s.signal && s.signal.spot)}</div></div></div>`;
+    }
+    if (!p && !t.positions.length) h += `<div class="empty">No training proposal right now. One is made each trading day from 09:45 IST.</div>`;
+    return h + "</article>";
+  }
+
   function legTable(legs, live) {
     return `<div class="tablewrap"><table><thead><tr><th>Leg</th><th>Lots</th><th>${live ? "Entry" : "Limit"}</th><th>Bid</th><th>Ask</th>${live ? "<th>P&amp;L</th>" : ""}</tr></thead><tbody>
       ${legs.map((l) => `<tr><td><span class="legside ${l.side}">${l.side}</span> ${l.cp === "C" ? "CE" : "PE"} ${Math.round(l.strike)}</td><td>${l.lots}</td>
@@ -193,6 +241,12 @@
     if (!rows.length) { $("#journal").innerHTML = `<div class="empty">No closed trades yet.</div>`; return; }
     const cols = ["closed", "strategy", "expiry", "lots", "credit", "max_loss", "pnl", "reason", "mode"];
     $("#journal").innerHTML = `<table><thead><tr>${cols.map((c) => `<th>${c.replace("_", " ")}</th>`).join("")}</tr></thead><tbody>${rows.slice().reverse().map((r) => `<tr>${cols.map((c) => `<td class="${c === "pnl" ? cls(+r[c]) : ""}">${["credit", "max_loss", "pnl"].includes(c) ? inr(+r[c]) : esc(r[c])}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+  }
+
+  function renderTJournal(rows) {
+    if (!rows.length) { $("#tjournal").innerHTML = `<div class="empty">No closed training trades yet.</div>`; return; }
+    const cols = ["closed", "id", "expiry", "td_left_at_entry", "credit", "max_loss", "pnl", "reason", "gate_reason", "vix", "rv_fcst"];
+    $("#tjournal").innerHTML = `<table><thead><tr>${cols.map((c) => `<th>${c.replaceAll("_", " ")}</th>`).join("")}</tr></thead><tbody>${rows.slice().reverse().map((r) => `<tr>${cols.map((c) => `<td class="${c === "pnl" ? cls(+r[c]) : ""}">${["credit", "max_loss", "pnl"].includes(c) ? inr(+r[c]) : ["vix", "rv_fcst"].includes(c) ? num(+r[c]) : esc(r[c])}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
   }
 
   function renderEquity(series) {
@@ -269,6 +323,7 @@
     try {
       const [s, jr, eq, lg] = await Promise.all([j("data/status.json"), j("data/journal.json"), j("data/equity.json"), j("data/log.json")]);
       render(s); renderJournal(jr); renderEquity(eq);
+      j("data/training_journal.json").then(renderTJournal).catch(() => renderTJournal([]));
       $("#log").textContent = lg.slice(-120).reverse().join("\n");
     } catch (e) {
       $("#signal").innerHTML = `<div class="empty">Waiting for the first engine run… (${esc(e.message)})</div>`;

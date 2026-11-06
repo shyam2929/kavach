@@ -69,6 +69,32 @@ def export(engine, out: Path, now: dt.datetime, note: str = ""):
         pending = dict(pending)
         pending["payoff"] = payoff_curve(pending["legs"], float(pending["spot"]), price_key="limit")
 
+    dp = es.get("data_pending")
+    if dp:
+        dp = dict(dp)
+        dp["payoff"] = payoff_curve(dp["legs"], float(dp["spot"]), price_key="limit")
+    data_positions = []
+    for pos in getattr(engine, "data_book", []):
+        try:
+            mk = engine._data_marks(pos)
+        except Exception:
+            mk = [{"cp": f["leg"]["cp"], "strike": f["leg"]["strike"], "side": f["leg"]["side"], "lots": f["leg"]["lots"],
+                   "entry": f["price"], "bid": None, "ask": None, "mid": None, "pnl": None} for f in pos["fills"]]
+        m = sum(x["pnl"] for x in mk if x["pnl"] is not None) if mk else 0.0
+        data_positions.append({k: pos[k] for k in ("id", "opened", "expiry", "strategy", "lots", "credit", "max_loss",
+                                                   "tp_rs", "gate_open", "gate_reason", "spot", "atm_iv")}
+                              | {"legs": mk, "mtm": m, "payoff": payoff_curve(mk, float(pos["spot"]))})
+    dj = _csv_rows(P("data_journal.csv"))
+    realized = sum(float(r["pnl"]) for r in dj)
+    by_gate = {}
+    for r in dj:
+        k = "gate open" if r["gate_open"] == "True" else "gate shut"
+        by_gate.setdefault(k, []).append(float(r["pnl"]))
+    training = {"pending": dp, "positions": data_positions, "closed": len(dj), "realized": realized,
+                "open_mtm": sum(p["mtm"] for p in data_positions),
+                "win_rate": (sum(1 for r in dj if float(r["pnl"]) > 0) / len(dj)) if dj else None,
+                "by_gate": {k: {"n": len(v), "pnl": sum(v), "avg": sum(v) / len(v)} for k, v in by_gate.items()}}
+
     equity_mark = (engine.book["equity_at_entry"] + mtm) if engine.book else S.equity
     series = []
     sp = P("equity_series.json")
@@ -92,7 +118,7 @@ def export(engine, out: Path, now: dt.datetime, note: str = ""):
         "consecutive_losses": S.consecutive_losses, "cooldown_until": S.cooldown_until_expiry,
         "entries_today": S.entries_today, "signal": es.get("last_signal"), "last_iv": es.get("last_iv"),
         "last_step": es.get("last_step"), "entered_cycle": es.get("entered_cycle"),
-        "position": position, "pending": pending,
+        "position": position, "pending": pending, "training": training,
         "iv_calibration": iv_calibration(_csv_rows(P("iv_samples.csv"))),
         "limits": {"risk_per_trade": g.L["per_trade"]["risk_per_trade"], "max_loss_pct": g.L["per_trade"]["max_loss_pct"],
                    "max_lots": g.L["per_trade"]["max_lots"], "daily_max_loss_pct": g.L["daily"]["max_loss_pct"],
@@ -101,6 +127,7 @@ def export(engine, out: Path, now: dt.datetime, note: str = ""):
     }
     (out / "status.json").write_text(json.dumps(status, default=str))
     (out / "journal.json").write_text(json.dumps(_csv_rows(P("journal.csv")), default=str))
+    (out / "training_journal.json").write_text(json.dumps(dj, default=str))
     (out / "equity.json").write_text(json.dumps(series))
     (out / "iv.json").write_text(json.dumps(_csv_rows(P("iv_samples.csv"), 1000)))
     lp = P("engine.log")

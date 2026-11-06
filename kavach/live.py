@@ -79,7 +79,7 @@ def _save(name, obj):
 class Engine:
     def __init__(self, broker: Broker, strategy, governor: RiskGovernor | None = None,
                  approval: str | None = None, refresh: bool = True, vix_fn=None,
-                 holidays: set[str] | None = None):
+                 holidays: set[str] | None = None, training: bool = True):
         self.b, self.strat = broker, strategy
         self.g = governor or RiskGovernor()
         self.approval = approval or self.g.L["mode"]["approval"]
@@ -93,6 +93,8 @@ class Engine:
                                         "last_step": None, "last_signal": None, "last_iv": None,
                                         "strategy": strategy.name})
         self.book = _load("book.json", None)
+        self.data_book = _load("data_book.json", [])      # training book: daily 1-lot paper trades
+        self.training = training and broker.paper           # never on a live broker
         self._signal_cache = None
         if not broker.paper:
             ok, why = self.g.live_allowed()
@@ -104,6 +106,7 @@ class Engine:
 
     def _persist(self):
         _save("engine.json", self.es)
+        _save("data_book.json", self.data_book)
         if self.book:
             _save("book.json", self.book)
         else:
@@ -303,10 +306,22 @@ class Engine:
         elif name == "resume":
             self.es["paused"] = False; msg = "resumed"
         elif name == "flatten":
+            parts = []
             if self.book:
-                self.close_book("manual flatten", now); msg = "position closed"
-            else:
-                msg = "no open position"
+                self.close_book("manual flatten", now); parts.append("main position closed")
+            n = 0
+            for pos in list(self.data_book):
+                if not arg or arg == pos["id"]:
+                    self._close_data(pos, "manual flatten", now); n += 1
+            if n:
+                parts.append(f"{n} training position(s) closed")
+            msg = "; ".join(parts) or "no open position"
+        elif name == "reject" and self.es.get("data_pending") and arg == self.es["data_pending"]["id"]:
+            self.es["data_pending"] = None
+            self.es["data_last_day"] = now.date().isoformat()
+            msg = f"training proposal {arg} rejected for today"
+        elif name == "approve" and self.es.get("data_pending") and arg == self.es["data_pending"]["id"]:
+            msg = self._approve_data(arg, now)
         elif name == "reject":
             p = self.es.get("pending")
             if p and (not arg or arg == p["id"]):
@@ -387,7 +402,15 @@ class Engine:
         except Exception as e:
             self._log_once(f"signal unavailable: {e!r}", now)
         try:
-            return self._step(now)
+            res = self._step(now)
+            if self.training and res not in ("market closed", "market holiday"):
+                try:
+                    d = self._data_step(now)
+                    if d:
+                        res = f"{res} || training: {d}"
+                except Exception as e:
+                    log(f"training step error: {e!r}", now)
+            return res
         finally:
             self._persist()
 
@@ -449,6 +472,146 @@ class Engine:
             self.es["pending"] = prop
             return f"proposal {prop['id']} awaiting approval"
         return "entered" if self._open(b, dec, now, expiry) else "execution failed"
+
+    # ---------------- training book (daily paper trades for data) ----------------
+    def _data_expiry(self, now: dt.datetime) -> str | None:
+        for e in sorted(self.b.expiries()):
+            if trading_days_between(now.date(), dt.date.fromisoformat(e), self.holidays) >= 2:
+                return e
+        return None
+
+    def _data_marks(self, pos) -> list[dict]:
+        ch = self.b.chain(pos["expiry"])
+        out = []
+        for f in pos["fills"]:
+            L = f["leg"]
+            r = ch[(ch.strike == L["strike"]) & (ch.cp == L["cp"])]
+            r = r.iloc[0] if not r.empty else None
+            liq = (r.bid if L["side"] == "BUY" else r.ask) if r is not None else float("nan")
+            sgn = 1 if L["side"] == "BUY" else -1
+            out.append({"cp": L["cp"], "strike": L["strike"], "side": L["side"], "lots": L["lots"],
+                        "entry": f["price"], "bid": None if r is None else float(r.bid),
+                        "ask": None if r is None else float(r.ask), "mid": None if r is None else float(mid(r)),
+                        "pnl": sgn * (liq - f["price"]) * L["lots"] * LOT_SIZE})
+        return out
+
+    def _close_data(self, pos, reason: str, now: dt.datetime):
+        try:
+            pnl = float(sum(m["pnl"] for m in self._data_marks(pos)))
+            self._unwind(pos["fills"], pos["expiry"])
+        except Exception as e:
+            pnl = pos.get("last_mtm", 0.0)
+            log(f"training close used last mark ({e!r})", now)
+        row = {"closed": now.isoformat(timespec="minutes"), "opened": pos["opened"], "id": pos["id"],
+               "expiry": pos["expiry"], "td_left_at_entry": pos["td_left"], "strategy": pos["strategy"],
+               "lots": pos["lots"], "credit": round(pos["credit"], 2), "max_loss": round(pos["max_loss"], 2),
+               "pnl": round(pnl, 2), "reason": reason, "gate_open": pos["gate_open"], "gate_reason": pos["gate_reason"],
+               "vix": pos["signal"].get("vix"), "rv_fcst": pos["signal"].get("rv_fcst"), "atm_iv": pos["atm_iv"],
+               "spot_entry": pos["spot"], "mode": "paper-training"}
+        _append_csv(P("data_journal.csv"), row)
+        self.data_book = [p for p in self.data_book if p["id"] != pos["id"]]
+        log(f"TRAINING CLOSED {pos['id']} ({reason}) pnl {pnl:,.0f}", now)
+
+    def _data_proposal(self, now: dt.datetime):
+        expiry = self._data_expiry(now)
+        if not expiry:
+            return None, "no suitable expiry"
+        sig = self.es.get("last_signal") or {}
+        chain, spot = self.b.chain(expiry), self.b.spot()
+        iv, t, F, _ = self.atm_iv(chain, spot, expiry, now)
+        if not iv == iv:
+            return None, "no ATM IV from chain"
+        # gates are RECORDED, not enforced: force the plan, then label what the gates said
+        plan = self.strat.plan(spot, t, iv, rv_fcst=-1e9, stress=False)
+        gate_open = (not sig.get("stress")) and (iv * 100 >= sig.get("rv_fcst", 0))
+        gate_reason = ("stress regime" if sig.get("stress") else
+                       f"no premium (IV {iv * 100:.1f} < RV fcst {sig.get('rv_fcst', float('nan')):.1f})"
+                       if iv * 100 < sig.get("rv_fcst", 0) else "gates open")
+        strikes = sorted(set(chain.strike))
+        legs = [self._leg(chain, l.cp, min(strikes, key=lambda k: abs(k - l.K)), expiry,
+                          "BUY" if l.qty > 0 else "SELL", 1) for l in plan.legs]
+        dec = self.g.check_structure(legs, now)
+        if not dec.ok:
+            return None, "; ".join(dec.reasons)
+        credit = sum((1 if l.side == "SELL" else -1) * l.limit_price for l in legs) * LOT_SIZE
+        pid = "T" + hashlib.sha1(f"{now.isoformat()}{expiry}".encode()).hexdigest()[:5]
+        return {"id": pid, "kind": "training", "created": now.isoformat(timespec="minutes"),
+                "valid_until": f"{now.date().isoformat()}T{self.g.L['orders']['entry_window'][1]}",
+                "expiry": expiry, "td_left": trading_days_between(now.date(), dt.date.fromisoformat(expiry), self.holidays),
+                "strategy": plan.name, "lots": 1, "spot": spot, "atm_iv": iv, "credit": credit,
+                "max_loss": dec.max_loss_rs, "take_profit": plan.take_profit, "stop": plan.stop,
+                "gate_open": gate_open, "gate_reason": gate_reason, "signal": dict(sig),
+                "legs": [{"cp": l.cp, "strike": l.strike, "side": l.side, "lots": l.lots, "limit": l.limit_price,
+                          "bid": l.bid, "ask": l.ask} for l in legs]}, None
+
+    def _approve_data(self, pid: str, now: dt.datetime) -> str:
+        p = self.es.get("data_pending")
+        if not p or p["id"] != pid:
+            return "no matching training proposal"
+        if now.date().isoformat() != p["created"][:10]:
+            self.es["data_pending"] = None
+            return "training proposal expired (made on an earlier day)"
+        legs = []
+        chain = self.b.chain(p["expiry"])
+        for l in p["legs"]:
+            legs.append(self._leg(chain, l["cp"], l["strike"], p["expiry"], l["side"], 1))
+        dec = self.g.check_structure(legs, now)
+        if not dec.ok:
+            self.es["data_pending"] = None
+            return "blocked at approval: " + "; ".join(dec.reasons)
+        fills = self._execute(legs, p["expiry"])
+        self.es["data_pending"] = None
+        self.es["data_last_day"] = now.date().isoformat()
+        if not fills:
+            return "execution failed; legs unwound"
+        credit = sum((1 if f["leg"]["side"] == "SELL" else -1) * f["price"] for f in fills) * LOT_SIZE
+        ml = self.g.basket_max_loss([OrderLeg(**{**f["leg"], "limit_price": f["price"]}) for f in fills])
+        pos = {k: p[k] for k in ("id", "expiry", "td_left", "strategy", "lots", "spot", "atm_iv", "gate_open",
+                                 "gate_reason", "signal")}
+        pos.update({"opened": now.isoformat(timespec="minutes"), "fills": fills, "credit": credit, "max_loss": ml,
+                    "tp_rs": p["take_profit"] * max(credit, 0.0), "last_mtm": 0.0})
+        self.data_book.append(pos)
+        log(f"TRAINING OPENED {pos['id']} {pos['strategy']} exp {pos['expiry']} credit Rs {credit:,.0f} "
+            f"worst case Rs {ml:,.0f} [{pos['gate_reason']}]", now)
+        return f"training trade {pid} opened"
+
+    def _data_step(self, now: dt.datetime) -> str:
+        msgs = []
+        today = now.date().isoformat()
+        for pos in list(self.data_book):
+            if pos["expiry"] < today:
+                self._close_data(pos, "expired (settled at last mark)", now); continue
+            try:
+                pos["last_mtm"] = float(sum(m["pnl"] for m in self._data_marks(pos)))
+            except Exception as e:
+                log(f"training mark failed {pos['id']}: {e!r}", now); continue
+            if pos["tp_rs"] > 0 and pos["last_mtm"] >= pos["tp_rs"]:
+                self._close_data(pos, "target", now)
+            elif pos["expiry"] == today and now.strftime("%H:%M") >= self.g.L["orders"]["flatten_on_expiry_by"]:
+                self._close_data(pos, "expiry close", now)
+        if self.data_book:
+            msgs.append(f"{len(self.data_book)} open, MTM {sum(p['last_mtm'] for p in self.data_book):,.0f}")
+        p = self.es.get("data_pending")
+        if p and now.isoformat(timespec="minutes") > p["valid_until"]:
+            log(f"training proposal {p['id']} expired unapproved", now)
+            self.es["data_pending"] = None
+            self.es["data_last_day"] = today
+        if self.es.get("data_pending"):
+            msgs.append(f"proposal {self.es['data_pending']['id']} awaiting approval")
+        elif self.es.get("data_last_day") != today and not self.es.get("paused"):
+            prop, why = self._data_proposal(now)
+            if prop is None:
+                self._log_once(f"training: no proposal ({why})", now)
+            else:
+                log(f"TRAINING PROPOSAL {prop['id']} {prop['strategy']} exp {prop['expiry']} credit Rs {prop['credit']:,.0f} "
+                    f"worst case Rs {prop['max_loss']:,.0f} [{prop['gate_reason']}]", now)
+                if self.approval == "manual":
+                    self.es["data_pending"] = prop
+                    msgs.append(f"proposal {prop['id']} awaiting approval")
+                else:
+                    self.es["data_pending"] = prop
+                    msgs.append(self._approve_data(prop["id"], now))
+        return "; ".join(msgs)
 
     # ---------------- dashboard export ----------------
     def export(self, out_dir: Path, now: dt.datetime | None = None, note: str = ""):

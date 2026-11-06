@@ -333,6 +333,28 @@ class RiskGovernor:
             why.append(f"in drawdown {dd:.1%}: size must be halved")
         return Decision(not why, why, ml)
 
+    def check_structure(self, legs: list[OrderLeg], now: dt.datetime, max_lots: int = 1) -> Decision:
+        """Training-book check: the structural safety rules only (defined risk, sane prices, lot cap,
+        entry window). Account-level gates don't apply: the training book is notional paper data and
+        never feeds the live-readiness count."""
+        why = []
+        t0, t1 = self.L["orders"]["entry_window"]
+        if not (t0 <= now.strftime("%H:%M") <= t1):
+            why.append(f"outside entry window {t0}-{t1}")
+        for l in legs:
+            if l.lots > max_lots:
+                why.append(f"{l.lots} lots > training cap {max_lots}")
+            p = self._price_ok(l)
+            if p:
+                why.append(p)
+        d = self.defined_risk(legs)
+        if d:
+            why.append(d)
+        ml = self.basket_max_loss(legs)
+        if not math.isfinite(ml):
+            why.append("unbounded loss")
+        return Decision(not why, why, ml)
+
     def check_exit(self, legs: list[OrderLeg]) -> Decision:
         why = [p for p in (self._price_ok(l) for l in legs) if p]
         return Decision(not why, why)

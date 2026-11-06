@@ -28,14 +28,15 @@ def env(tmp_path, monkeypatch):
     return tmp_path
 
 
-def make(approval="auto", stress=False, spot=25500.0):
+def make(approval="auto", stress=False, spot=25500.0, training=False):
     clock = {"d": T0.date()}
     s = {"s": spot}
     q = SyntheticQuotes(lambda: s["s"], lambda: 13.0, today_fn=lambda: clock["d"])
     b = PaperBroker(q)
     g = RiskGovernor(load_limits(), AccountState(equity=1e5, peak=1e5, day_start_equity=1e5, week_start_equity=1e5))
     e = live.Engine(b, IronFly(wing_z=1.0, take_profit=0.5, stop=0.5, name="fly_test"), g,
-                    approval=approval, refresh=False, vix_fn=lambda: 13.0, holidays=set())
+                    approval=approval, refresh=False, vix_fn=lambda: 13.0, holidays=set(),
+                    training=training)
     e.daily_signal = lambda today: {"day": str(today), "rv_fcst": 10.0, "stress": stress, "vix": 13.0}
     return e, b, clock, s
 
@@ -121,6 +122,40 @@ def test_trading_days_skip_holidays():
     # Wed 4 Nov -> Mon 9 Nov expiry (Tue 10 Nov is Diwali-Balipratipada)
     assert trading_days_between(d.date(2026, 11, 4), d.date(2026, 11, 9), set()) == 3
     assert trading_days_between(d.date(2026, 11, 4), d.date(2026, 11, 11), {"2026-11-10"}) == 4
+
+
+def test_training_book_daily_regardless_of_gates(env):
+    e, b, clock, s = make("manual", stress=True, training=True)
+    e.es["last_signal"] = {"stress": True, "rv_fcst": 10.0, "vix": 13.0}
+    r = e.step(T0)
+    assert "stress" in r and "training: proposal" in r            # main blocked, training proposes
+    p = e.es["data_pending"]
+    assert p["gate_open"] is False and p["gate_reason"] == "stress regime" and p["lots"] == 1
+    assert p["td_left"] >= 2
+    assert "opened" in e.command("approve", p["id"], T0 + dt.timedelta(minutes=5))
+    assert len(e.data_book) == 1 and len(b.fills) == 4
+    assert [f["leg"]["side"] for f in e.data_book[0]["fills"]] == ["BUY", "BUY", "SELL", "SELL"]
+    # one per day: no second proposal today
+    e.step(T0 + dt.timedelta(minutes=30))
+    assert e.es.get("data_pending") is None and len(e.data_book) == 1
+    # next day: a new proposal while the first stays open
+    clock["d"] = dt.date(2026, 11, 5)
+    e.step(dt.datetime(2026, 11, 5, 10, 0, tzinfo=IST))
+    assert e.es["data_pending"] and e.es["data_pending"]["id"] != p["id"]
+    # flatten closes training positions and journals them with the gate label
+    e.command("flatten", "", dt.datetime(2026, 11, 5, 10, 5, tzinfo=IST))
+    assert not e.data_book
+    j = (env / "state" / "data_journal.csv").read_text()
+    assert "stress regime" in j and "paper-training" in j
+
+
+def test_training_never_on_live_broker(env):
+    e, b, *_ = make("auto", training=True)
+    b.paper = False
+    from kavach.live import Engine
+    e.g.S.paper_trades = 99
+    e2 = Engine(b, e.strat, e.g, approval="auto", refresh=False, holidays=set(), training=True)
+    assert e2.training is False
 
 
 def test_command_parse():
