@@ -83,6 +83,19 @@ def run_step(engine, site: Path | None, github_commands: bool, now=None) -> str:
     return note
 
 
+def _publish(site: Path):
+    """Commit and push the site/state dir; rebase onto any concurrent change first."""
+    g = ["git", "-C", str(site)]
+    subprocess.run(g + ["add", "-A"], check=False)
+    if subprocess.run(g + ["diff", "--cached", "--quiet"]).returncode == 0:
+        return
+    subprocess.run(g + ["commit", "-qm", f"engine step {dt.datetime.utcnow():%Y-%m-%dT%H:%MZ}"], check=False)
+    for _ in range(3):
+        if subprocess.run(g + ["push", "-q"]).returncode == 0:
+            return
+        subprocess.run(g + ["pull", "-q", "--rebase", "-X", "theirs"], check=False)
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(prog="kavach")
     ap.add_argument("cmd")
@@ -94,6 +107,7 @@ def main(argv=None):
     ap.add_argument("--live", action="store_true")
     ap.add_argument("--push", action="store_true", help="loop: git commit+push the site dir after each step")
     ap.add_argument("--every", type=int, default=60)
+    ap.add_argument("--max-minutes", type=int, default=0, help="loop: stop after N minutes (cloud runner)")
     ap.add_argument("--confirm", default=None)
     ap.add_argument("--approval", default=None, choices=[None, "manual", "auto"])
     a = ap.parse_args(argv)
@@ -135,12 +149,20 @@ def main(argv=None):
         if a.cmd == "step":
             print(run_step(eng, site, a.github_commands))
             return
+        # loop: step every --every seconds. --max-minutes bounds a cloud run (GitHub jobs max 6h);
+        # outside market hours a cloud run does one step (to publish state and apply commands) and exits.
+        from .live import IST
+        t_end = time.time() + a.max_minutes * 60 if a.max_minutes else float("inf")
         while True:
-            print(run_step(eng, site, a.github_commands))
+            print(run_step(eng, site, a.github_commands), flush=True)
             if a.push and site:
-                subprocess.run(["git", "-C", str(site), "add", "-A"], check=False)
-                subprocess.run(["git", "-C", str(site), "commit", "-qm", "kavach: state"], check=False)
-                subprocess.run(["git", "-C", str(site), "push", "-q"], check=False)
+                _publish(site)
+            now = dt.datetime.now(IST)
+            in_session = now.weekday() < 5 and dt.time(9, 10) <= now.time() <= dt.time(15, 35)
+            if a.max_minutes and not in_session:
+                break
+            if time.time() + a.every > t_end:
+                break
             time.sleep(a.every)
 
     elif a.cmd == "upstox-login":

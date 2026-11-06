@@ -68,7 +68,7 @@ def test_reject_and_expiry_and_pause(env):
     e.step(T0)
     pid = e.es["pending"]["id"]
     assert "rejected" in e.command("reject", pid, T0)
-    assert "already handled" in e.step(T0 + dt.timedelta(minutes=15))    # no re-proposal this cycle
+    assert "already decided" in e.step(T0 + dt.timedelta(minutes=15))    # no re-proposal this cycle
 
     e2, *_ = make("manual")
     e2.es["entered_cycle"] = None

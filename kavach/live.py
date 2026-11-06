@@ -427,8 +427,11 @@ class Engine:
             self.es["pending"] = None
         if self.es.get("paused"):
             return "paused"
-        if not (3 <= td_left <= 6) or self.es.get("entered_cycle") == expiry:
-            return "no entry this step (cycle position or already handled)"
+        if self.es.get("entered_cycle") == expiry:
+            return f"already decided for the {expiry} expiry; next entries after it"
+        if not (3 <= td_left <= 6):
+            return (f"no entry: {td_left} trading day(s) left to the {expiry} expiry; "
+                    "new weekly positions open only when 3-6 trading days remain")
         b, why = self._build(now, expiry)
         if b is None:
             self._log_once(f"no trade: {why}", now)
