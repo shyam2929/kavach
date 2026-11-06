@@ -46,6 +46,21 @@ from first principles instead of copying it.
 - **The thread's approach** (opening-range breakout, buying ATM options at 20% of capital) over the last 60 trading days (11 Aug – 5 Nov 2026):
   59 trades, 32% winners, **−₹30,475**. It lost money even at zero cost. No ₹10k day.
 
+## Crude oil (MCX Crude Oil Mini options)
+
+Strategy and evidence: see the KAVACH-Crude doc. In short: no directional crude edge survived testing; the volatility premium did
+(OVX > next-month realised vol 72% of days, 2012–2026). Two paper books run alongside Nifty on the same governor and dashboard:
+
+- **Main:** stress-gated monthly iron condor (short ±0.6σ, wings ±1.5σ), 1 Mini lot, worst case ≤ 10% of equity, crude + Nifty
+  worst cases ≤ 25%. Gate: OVX +15%/5d, crude −5%/5d, >10% below 20-day high, or OVX > 70 → no entry.
+- **Training:** one 1-lot condor proposed every MCX day (10:00–22:00 IST; none on Wednesdays after 18:00, the EIA window) on the
+  nearest options expiry with ≥ 5 trading days left; gates recorded, not enforced.
+- Both close at 60% of credit, or from 17:00 IST two trading days before options expiry (ITM options would turn into futures).
+- Quotes: Upstox instrument master + market quotes (same `UPSTOX_ANALYTICS_TOKEN`), else WTI × USD/INR with OVX as IV.
+- Session from Upstox's MCX calendar: 09:00–23:30 IST (23:55 in US daylight saving), special sessions honoured.
+- Commands: crude ids start with `C` (main) or `CT` (training): `kavach: approve CT1a2b3`. Pause/resume/flatten apply to both markets.
+- `--no-crude` turns it off. Live crude is not wired; it stays paper until it earns promotion.
+
 ## How it runs
 
 ```

@@ -21,12 +21,17 @@ def _csv_rows(path: Path, last: int | None = None) -> list[dict]:
 
 
 def payoff_curve(legs: list[dict], center: float, credit_per_unit: float | None = None, lots_key="lots",
-                 price_key="entry") -> list[list[float]]:
-    """Expiry P&L (Rs) over spot +-5% for legs [{cp,strike,side,lots,entry|limit}]."""
-    xs = np.linspace(center * 0.95, center * 1.05, 121)
+                 price_key="entry", lot: int = LOT_SIZE, width: float | None = None) -> list[list[float]]:
+    """Expiry P&L (Rs) around `center` for legs [{cp,strike,side,lots,entry|limit}]. Default range: the
+    wings +-30% of their distance, or +-5% when no legs."""
+    ks = [l["strike"] for l in legs]
+    lo, hi = (min(ks), max(ks)) if ks else (center, center)
+    pad = max((hi - lo) * 0.3, center * 0.01)
+    lo, hi = min(lo - pad, center * 0.95), max(hi + pad, center * 1.05)
+    xs = np.linspace(lo, hi, 121)
     pnl = np.zeros_like(xs)
     for l in legs:
-        q = l[lots_key] * LOT_SIZE * (1 if l["side"] == "BUY" else -1)
+        q = l[lots_key] * lot * (1 if l["side"] == "BUY" else -1)
         intr = np.maximum(xs - l["strike"], 0) if l["cp"] == "C" else np.maximum(l["strike"] - xs, 0)
         pnl += q * (intr - float(l[price_key]))
     return [[round(float(x), 1), round(float(y), 0)] for x, y in zip(xs, pnl)]
@@ -43,7 +48,7 @@ def iv_calibration(rows: list[dict]) -> dict:
             "p75": float(np.quantile(r, .75)), "by_days_left": {k: round(float(np.median(v)), 3) for k, v in sorted(by_td.items())}}
 
 
-def export(engine, out: Path, now: dt.datetime, note: str = ""):
+def export(engine, out: Path, now: dt.datetime, note: str = "", extra: dict | None = None):
     from .live import P
     out.mkdir(parents=True, exist_ok=True)
     g, es, S = engine.g, engine.es, engine.g.S
@@ -125,6 +130,7 @@ def export(engine, out: Path, now: dt.datetime, note: str = ""):
                    "halt_at": g.L["drawdown"]["halt_at"], "entry_window": g.L["orders"]["entry_window"],
                    "max_consecutive_losses": g.L["behaviour"]["max_consecutive_losses"]},
     }
+    status.update(extra or {})
     (out / "status.json").write_text(json.dumps(status, default=str))
     (out / "journal.json").write_text(json.dumps(_csv_rows(P("journal.csv")), default=str))
     (out / "training_journal.json").write_text(json.dumps(dj, default=str))

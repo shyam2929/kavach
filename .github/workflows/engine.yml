@@ -7,7 +7,7 @@
 name: engine
 on:
   schedule:
-    - cron: "7,37 3-10 * * 1-5"      # 08:37-16:07 IST weekdays, off the :00/:15 rush
+    - cron: "7,37 3-17 * * 1-5"      # 08:37-23:07 IST weekdays (NSE + MCX crude to 23:30), off the :00/:15 rush
   issues:
     types: [opened]
   workflow_dispatch:
@@ -37,7 +37,7 @@ jobs:
           touch pages/.nojekyll
           git -C pages config user.name "kavach-bot"
           git -C pages config user.email "kavach-bot@users.noreply.github.com"
-      - name: engine loop (every 2 min, up to 58 min, market hours only)
+      - name: engine loop (every 2 min, up to 58 min; NSE + MCX sessions)
         env:
           KAVACH_STATE: pages/state
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

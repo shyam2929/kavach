@@ -59,7 +59,46 @@ def _paper_broker(quotes: str):
     return PaperBroker(SyntheticQuotes(spot, vix)), "synthetic", None
 
 
-def run_step(engine, site: Path | None, github_commands: bool, now=None) -> str:
+def _crude_engine(nifty_engine, approval):
+    """Paper crude engine sharing the Nifty governor (one account, combined risk cap)."""
+    import datetime as _dt
+    import pandas as pd
+    from . import crude as C
+    from .brokers.paper import PaperBroker
+    try:
+        master = C.load_master()
+    except Exception:
+        master = []
+    exp_fn = lambda: C.option_expiries_from_master(master, _dt.datetime.now(C.IST).date())
+    if (os.environ.get("UPSTOX_ANALYTICS_TOKEN") or os.environ.get("UPSTOX_ACCESS_TOKEN")) and master:
+        quotes = C.UpstoxCrudeQuotes(master=master)
+    else:
+        cache = C.DATA_DIR / "crude_daily.csv"
+
+        def last(col, sym):
+            try:
+                return C._yahoo_last(sym)
+            except Exception:
+                return float(pd.read_csv(cache, index_col=0)[col].iloc[-1])
+        quotes = C.SyntheticCrudeQuotes(lambda: last("wti", "CL%3DF") * last("inr", "USDINR%3DX"),
+                                        lambda: last("ovx", "%5EOVX"), exp_fn)
+    sig_cache = {}
+
+    def signal(day):
+        if day not in sig_cache:
+            try:
+                df = C.refresh_crude_daily()
+            except Exception:
+                df = pd.read_csv(C.DATA_DIR / "crude_daily.csv", index_col=0, parse_dates=True)
+            sig_cache[day] = C.crude_signal(df)
+        return sig_cache[day]
+
+    risk = lambda: float(nifty_engine.book["max_loss"]) if nifty_engine.book else 0.0
+    return C.CrudeEngine(PaperBroker(quotes), nifty_engine.g, approval=approval or nifty_engine.approval,
+                         signal_fn=signal, nifty_open_risk_fn=risk)
+
+
+def run_step(engine, site: Path | None, github_commands: bool, now=None, crude=None) -> str:
     from .live import IST, log
     now = now or dt.datetime.now(IST)
     msgs = []
@@ -67,8 +106,17 @@ def run_step(engine, site: Path | None, github_commands: bool, now=None) -> str:
         from . import commands
         try:
             for c in commands.pending_commands():
-                m = engine.command(c["name"], c["arg"], now)
-                msgs.append(f"#{c['number']} {c['name']}: {m}")
+                name, arg = c["name"], c["arg"]
+                parts = []
+                if crude is not None:
+                    mc = crude.command(name, arg, now)
+                    if mc:
+                        parts.append(mc)
+                crude_only = arg.startswith("C") and name in ("approve", "reject", "flatten")
+                if not crude_only:
+                    parts.append(engine.command(name, arg, now))
+                m = " | ".join(parts)
+                msgs.append(f"#{c['number']} {name}: {m}")
                 commands.resolve(c["number"], m)
         except Exception as e:
             log(f"command channel error: {e!r}", now)
@@ -77,9 +125,20 @@ def run_step(engine, site: Path | None, github_commands: bool, now=None) -> str:
     except Exception as e:
         res = f"step error: {e!r}"
         log(res, now)
-    note = " | ".join(msgs + [res])
+    cres, extra = None, {}
+    if crude is not None:
+        try:
+            cres = "crude: " + crude.step(now)
+        except Exception as e:
+            cres = f"crude step error: {e!r}"
+            log(cres, now)
+        try:
+            extra["crude"] = crude.export()
+        except Exception as e:
+            log(f"crude export error: {e!r}", now)
+    note = " | ".join(msgs + [res] + ([cres] if cres else []))
     if site:
-        engine.export(site / "data", now, note)
+        engine.export(site / "data", now, note, extra=extra)
     return note
 
 
@@ -105,6 +164,7 @@ def main(argv=None):
     ap.add_argument("--site", default=None, help="dashboard dir; JSON goes to <site>/data")
     ap.add_argument("--github-commands", action="store_true")
     ap.add_argument("--live", action="store_true")
+    ap.add_argument("--no-crude", action="store_true", help="disable the MCX crude books")
     ap.add_argument("--push", action="store_true", help="loop: git commit+push the site dir after each step")
     ap.add_argument("--every", type=int, default=60)
     ap.add_argument("--max-minutes", type=int, default=0, help="loop: stop after N minutes (cloud runner)")
@@ -145,20 +205,23 @@ def main(argv=None):
             broker, src, vixf = _paper_broker(a.quotes)
         eng = Engine(broker, _strategy(a.strategy), RiskGovernor(), approval=a.approval, vix_fn=vixf)
         eng.quote_source = src
+        crude = None if (a.live or a.no_crude) else _crude_engine(eng, a.approval)
         site = Path(a.site) if a.site else None
         if a.cmd == "step":
-            print(run_step(eng, site, a.github_commands))
+            print(run_step(eng, site, a.github_commands, crude=crude))
             return
         # loop: step every --every seconds. --max-minutes bounds a cloud run (GitHub jobs max 6h);
         # outside market hours a cloud run does one step (to publish state and apply commands) and exits.
         from .live import IST
         t_end = time.time() + a.max_minutes * 60 if a.max_minutes else float("inf")
         while True:
-            print(run_step(eng, site, a.github_commands), flush=True)
+            print(run_step(eng, site, a.github_commands, crude=crude), flush=True)
             if a.push and site:
                 _publish(site)
             now = dt.datetime.now(IST)
-            in_session = now.weekday() < 5 and dt.time(9, 10) <= now.time() <= dt.time(15, 35)
+            # NSE 09:15-15:30; MCX 09:00-23:30 (23:55 in US daylight saving)
+            end = dt.time(23, 59) if crude is not None else dt.time(15, 35)
+            in_session = now.weekday() < 5 and dt.time(8, 55) <= now.time() <= end
             if a.max_minutes and not in_session:
                 break
             if time.time() + a.every > t_end:

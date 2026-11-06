@@ -145,6 +145,7 @@ class OrderLeg:
     ask: float = float("nan")
     security_id: str = ""
     underlying: str = "NIFTY"
+    lot_size: int = LOT_SIZE
 
 
 @dataclass
@@ -264,7 +265,7 @@ class RiskGovernor:
         grid = np.concatenate([np.linspace(lo, hi, 2001), strikes])
         pnl = np.zeros_like(grid)
         for l in legs:
-            q = l.lots * LOT_SIZE * (1 if l.side == "BUY" else -1)
+            q = l.lots * l.lot_size * (1 if l.side == "BUY" else -1)
             intr = np.maximum(grid - l.strike, 0) if l.cp == "C" else np.maximum(l.strike - grid, 0)
             pnl += q * (intr - l.limit_price)
         # beyond the grid an uncovered short keeps losing: test the slope at the edges

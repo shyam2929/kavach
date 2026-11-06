@@ -614,6 +614,6 @@ class Engine:
         return "; ".join(msgs)
 
     # ---------------- dashboard export ----------------
-    def export(self, out_dir: Path, now: dt.datetime | None = None, note: str = ""):
+    def export(self, out_dir: Path, now: dt.datetime | None = None, note: str = "", extra: dict | None = None):
         from .dashboard import export
-        export(self, Path(out_dir), now or dt.datetime.now(IST), note)
+        export(self, Path(out_dir), now or dt.datetime.now(IST), note, extra=extra)

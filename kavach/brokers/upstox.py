@@ -145,7 +145,7 @@ class UpstoxBroker(Broker):
         return self.md.chain(expiry)
 
     def place(self, leg: OrderLeg, timeout_s: float = 20.0) -> dict:
-        body = {"quantity": leg.lots * LOT_SIZE, "product": "D", "validity": "DAY",
+        body = {"quantity": leg.lots * leg.lot_size, "product": "D", "validity": "DAY",
                 "price": round(leg.limit_price, 2), "tag": "kavach", "instrument_token": leg.security_id,
                 "order_type": "LIMIT", "transaction_type": leg.side, "disclosed_quantity": 0,
                 "trigger_price": 0, "is_amo": False, "slice": True}
