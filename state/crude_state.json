@@ -1,79 +1,26 @@
 {
  "pending": {
-  "training": {
-   "id": "CT64a79",
-   "book": "training",
-   "created": "2026-11-09T16:48+05:30",
-   "valid_until": "2026-11-09T22:00",
-   "expiry": "2026-11-17",
-   "td_left": 6,
-   "strategy": "crude condor 0.6/1.5 sigma",
-   "lots": 1,
-   "spot": 8399.936162621307,
-   "atm_iv": 0.5730254470490596,
-   "credit": 1908.0,
-   "max_loss": 4592.000000000004,
-   "gate_open": false,
-   "gate_reason": "stress: crude -8.4% in 5 days; crude -15.2% below 20-day high",
-   "legs": [
-    {
-     "cp": "P",
-     "strike": 7300.0,
-     "side": "BUY",
-     "lots": 1,
-     "limit": 21.7,
-     "bid": 20.319172796292072,
-     "ask": 22.319172796292072
-    },
-    {
-     "cp": "C",
-     "strike": 9500.0,
-     "side": "BUY",
-     "lots": 1,
-     "limit": 24.0,
-     "bid": 22.607199890029822,
-     "ask": 24.607199890029822
-    },
-    {
-     "cp": "P",
-     "strike": 7950.0,
-     "side": "SELL",
-     "lots": 1,
-     "limit": 117.0,
-     "bid": 115.80098016266359,
-     "ask": 119.32791356863305
-    },
-    {
-     "cp": "C",
-     "strike": 8850.0,
-     "side": "SELL",
-     "lots": 1,
-     "limit": 119.5,
-     "bid": 118.30362776531543,
-     "ask": 121.9067839409088
-    }
-   ]
-  }
+  "training": null
  },
  "positions": [],
  "last_day": {},
  "paused": false,
  "signal": {
   "asof": "2026-11-09",
-  "ovx": 58.290000915527344,
-  "ovx_ch5": -0.07277135561593473,
-  "ret5": -0.08413122957806243,
-  "dd20": -0.15214403334147641,
-  "wti": 89.43000030517578,
-  "inr": 93.92749786376953,
-  "mcx": 8399.936162621307,
+  "ovx": 57.369998931884766,
+  "ovx_ch5": -0.0886804233840456,
+  "ret5": -0.10353862389144247,
+  "dd20": -0.16844006516534415,
+  "wti": 87.72000122070312,
+  "inr": 93.91799926757812,
+  "mcx": 8238.487010397948,
   "stress": true,
   "stress_reasons": [
-   "crude -8.4% in 5 days",
-   "crude -15.2% below 20-day high"
+   "crude -10.4% in 5 days",
+   "crude -16.8% below 20-day high"
   ]
  },
- "last_step": "2026-11-09T17:45:31+05:30",
+ "last_step": "2026-11-10T00:36:17+05:30",
  "last_reason": {
   "main": "main: no proposal (stress: crude -8.4% in 5 days; crude -15.2% below 20-day high)"
  },
