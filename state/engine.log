@@ -4,3 +4,5 @@
 2026-11-09 16:48:26 [crude] PROPOSAL CT64a79 (training) exp 2026-11-17 credit Rs 1,908 worst case Rs 4,592 [stress: crude -8.4% in 5 days; crude -15.2% below 20-day high]
 2026-11-10 17:01:44 [crude] main: no proposal (stress: crude -12.7% in 5 days; crude -19.1% below 20-day high)
 2026-11-10 17:01:44 [crude] PROPOSAL CT9bc59 (training) exp 2026-11-17 credit Rs 1,806 worst case Rs 4,194 [stress: crude -12.7% in 5 days; crude -19.1% below 20-day high]
+2026-11-10 17:51:03 [crude] could not fill SELL P7700; unwinding 2 legs
+2026-11-10 17:50:56 [crude] main: no proposal (stress: crude -13.0% in 5 days; crude -19.3% below 20-day high)
