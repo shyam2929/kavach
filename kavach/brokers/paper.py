@@ -55,10 +55,17 @@ class SyntheticQuotes:
 class PaperBroker(Broker):
     paper = True
 
-    def __init__(self, quotes):
+    SNAPSHOT_S = 20.0   # one quote snapshot per expiry for this long: the limit is priced and filled
+                        # against the same book (live feeds tick between two fetches; that made
+                        # marketable sells look non-marketable and unwound good trades)
+
+    def __init__(self, quotes, clock=None):
+        import time as _t
         self.q = quotes
         self._ids = itertools.count(1)
         self.fills: list[dict] = []
+        self._clock = clock or _t.monotonic
+        self._snap: dict[str, tuple[float, pd.DataFrame]] = {}
 
     def spot(self) -> float:
         return float(self.q.spot())
@@ -67,7 +74,16 @@ class PaperBroker(Broker):
         return self.q.expiries()
 
     def chain(self, expiry: str) -> pd.DataFrame:
-        return self.q.chain(expiry)
+        now = self._clock()
+        hit = self._snap.get(expiry)
+        if hit and now - hit[0] < self.SNAPSHOT_S:
+            return hit[1]
+        ch = self.q.chain(expiry)
+        self._snap[expiry] = (now, ch)
+        return ch
+
+    def refresh(self):
+        self._snap.clear()
 
     def place(self, leg: OrderLeg, timeout_s: float = 20.0) -> dict:
         ch = self.chain(leg.expiry)

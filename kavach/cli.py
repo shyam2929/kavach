@@ -99,9 +99,10 @@ def _crude_engine(nifty_engine, approval):
 
 
 def run_step(engine, site: Path | None, github_commands: bool, now=None, crude=None) -> str:
-    from .live import IST, log
+    from .live import IST, log, _load, _save
     now = now or dt.datetime.now(IST)
     msgs = []
+    actions = _load("actions.json", [])
     if github_commands and os.environ.get("GITHUB_TOKEN"):
         from . import commands
         try:
@@ -117,6 +118,11 @@ def run_step(engine, site: Path | None, github_commands: bool, now=None, crude=N
                     parts.append(engine.command(name, arg, now))
                 m = " | ".join(parts)
                 msgs.append(f"#{c['number']} {name}: {m}")
+                if crude_only:
+                    log(f"COMMAND {name} {arg} -> {m}", now)
+                actions = (actions + [{"ts": now.isoformat(timespec="seconds"), "cmd": name, "arg": arg,
+                                       "result": m, "issue": c["number"]}])[-15:]
+                _save("actions.json", actions)
                 commands.resolve(c["number"], m)
         except Exception as e:
             log(f"command channel error: {e!r}", now)
@@ -125,7 +131,7 @@ def run_step(engine, site: Path | None, github_commands: bool, now=None, crude=N
     except Exception as e:
         res = f"step error: {e!r}"
         log(res, now)
-    cres, extra = None, {}
+    cres, extra = None, {"actions": actions}
     if crude is not None:
         try:
             cres = "crude: " + crude.step(now)
@@ -140,6 +146,27 @@ def run_step(engine, site: Path | None, github_commands: bool, now=None, crude=N
     if site:
         engine.export(site / "data", now, note, extra=extra)
     return note
+
+
+def _dispatch_next(workflow: str = "engine.yml"):
+    """Start the next runner. workflow_dispatch is one of the events a GITHUB_TOKEN may trigger."""
+    import json as _j
+    import urllib.request
+    tok, repo = os.environ.get("GITHUB_TOKEN"), os.environ.get("GITHUB_REPOSITORY")
+    if not (tok and repo):
+        return
+    ref = os.environ.get("GITHUB_REF_NAME", "main")
+    req = urllib.request.Request(f"https://api.github.com/repos/{repo}/actions/workflows/{workflow}/dispatches",
+                                 data=_j.dumps({"ref": ref}).encode(), method="POST",
+                                 headers={"Authorization": f"Bearer {tok}", "Accept": "application/vnd.github+json"})
+    for _ in range(3):
+        try:
+            urllib.request.urlopen(req, timeout=20)
+            print("next run dispatched", flush=True)
+            return
+        except Exception as e:
+            print(f"dispatch failed: {e!r}", flush=True)
+            time.sleep(10)
 
 
 def _publish(site: Path):
@@ -168,6 +195,10 @@ def main(argv=None):
     ap.add_argument("--push", action="store_true", help="loop: git commit+push the site dir after each step")
     ap.add_argument("--every", type=int, default=60)
     ap.add_argument("--max-minutes", type=int, default=0, help="loop: stop after N minutes (cloud runner)")
+    ap.add_argument("--chain", action="store_true",
+                    help="cloud loop: stay up outside sessions (idle steps) and dispatch the next run at the end, "
+                         "so the runner never depends on GitHub's best-effort cron")
+    ap.add_argument("--idle-every", type=int, default=900, help="loop --chain: seconds between steps outside sessions")
     ap.add_argument("--confirm", default=None)
     ap.add_argument("--approval", default=None, choices=[None, "manual", "auto"])
     a = ap.parse_args(argv)
@@ -222,12 +253,20 @@ def main(argv=None):
             # NSE 09:15-15:30; MCX 09:00-23:30 (23:55 in US daylight saving)
             end = dt.time(23, 59) if crude is not None else dt.time(15, 35)
             in_session = now.weekday() < 5 and dt.time(8, 55) <= now.time() <= end
-            if a.max_minutes and not in_session:
+            if a.max_minutes and not in_session and not a.chain:
                 break
-            if time.time() + a.every > t_end:
+            wait = a.every if in_session else a.idle_every
+            if not in_session and a.chain:
+                # wake up in time for the next session open
+                nxt = now.replace(hour=8, minute=56, second=0, microsecond=0)
+                if nxt <= now:
+                    nxt += dt.timedelta(days=1)
+                wait = max(30, min(wait, (nxt - now).total_seconds()))
+            if time.time() + wait > t_end:
                 break
-            time.sleep(a.every)
-
+            time.sleep(wait)
+        if a.chain:
+            _dispatch_next()
     elif a.cmd == "upstox-login":
         from .brokers.upstox import login_url, exchange_code
         cid, sec = os.environ["UPSTOX_CLIENT_ID"], os.environ["UPSTOX_CLIENT_SECRET"]

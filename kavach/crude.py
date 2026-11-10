@@ -323,7 +323,7 @@ class CrudeEngine:
         done = []
         for leg in sorted(legs, key=lambda l: 0 if l.side == "BUY" else 1):
             fill = None
-            for aggress in (0.3, 0.7, 1.0):
+            for aggress in (0.3, 0.7, 1.0, 1.5):   # 1.5 crosses the touch: last try fills
                 lg = self._leg(self.b.chain(expiry), leg.cp, leg.strike, expiry, leg.side, aggress)
                 self.g.wait_rate()
                 fill = self.b.place(lg)
@@ -340,7 +340,7 @@ class CrudeEngine:
         for f in filled:
             L = f["leg"]
             side = "SELL" if L["side"] == "BUY" else "BUY"
-            for aggress in (0.7, 1.0, 1.0):
+            for aggress in (0.7, 1.0, 1.5, 2.0):
                 lg = self._leg(self.b.chain(expiry), L["cp"], L["strike"], expiry, side, aggress)
                 self.g.wait_rate()
                 if self.b.place(lg)["status"] == "FILLED":
@@ -476,6 +476,7 @@ class CrudeEngine:
 
     def command(self, name: str, arg: str, now: dt.datetime) -> str | None:
         """Handles crude commands; returns None if the command isn't for crude."""
+        getattr(self.b, "refresh", lambda: None)()   # fresh quote snapshot per step/command
         if name == "approve" and arg.startswith("C"):
             return self.approve(arg, now)
         if name == "reject" and arg.startswith("C"):
@@ -497,6 +498,7 @@ class CrudeEngine:
             self.st["last_reason"][key] = msg
 
     def step(self, now: dt.datetime | None = None) -> str:
+        getattr(self.b, "refresh", lambda: None)()   # fresh quote snapshot per step/command
         now = now or dt.datetime.now(IST)
         self.st["last_step"] = now.isoformat(timespec="seconds")
         try:

@@ -153,3 +153,23 @@ def test_upstox_crude_chain_parsing():
     assert len(ch) == 6 and set(ch.cp) == {"C", "P"}
     r = ch[(ch.strike == 8450) & (ch.cp == "P")].iloc[0]
     assert (r.bid, r.ask) == (148.0, 152.0) and r.security_id == "MCX_FO|8450PE"
+
+
+def test_paper_snapshot_fills_marketable_sell_despite_ticking_feed():
+    """Regression (10 Nov 2026): the feed moved between pricing and filling, so a sell at the bid
+    was 'not marketable' and a good trade was unwound."""
+    import itertools
+    import pandas as pd
+    from kavach.brokers.paper import PaperBroker
+    from kavach.governor import OrderLeg
+    tick = itertools.count()
+
+    class Ticking:
+        def chain(self, expiry):
+            b = 100.0 - next(tick)          # bid falls by 1 on every fetch
+            return pd.DataFrame([{"strike": 7700.0, "cp": "P", "bid": b, "ask": b + 2, "ltp": b + 1,
+                                  "iv": .5, "security_id": "x"}])
+    br = PaperBroker(Ticking(), clock=lambda: 0.0)
+    r = br.chain("2026-11-17").iloc[0]
+    leg = OrderLeg("P", 7700.0, "2026-11-17", "SELL", 1, float(r.bid), float(r.bid), float(r.ask), "x")
+    assert br.place(leg)["status"] == "FILLED"

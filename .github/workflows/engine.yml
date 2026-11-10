@@ -1,13 +1,13 @@
-# Paper-trading runner. GitHub's cron is best-effort (runs get delayed or dropped), so each run
-# keeps itself alive through market hours: it steps every 2 minutes for up to ~58 minutes,
-# publishing state + dashboard after every step and polling dashboard commands (GitHub issues).
-# Two staggered triggers per hour start the next run; if one is still going, the next waits its turn.
-# Outside market hours a run does a single step (applies commands, publishes) and exits.
+# Paper-trading runner. GitHub's cron is best-effort and in practice dropped most runs (no runs at all
+# during NSE hours on 9-10 Nov 2026), so the runner is a self-sustaining chain: each run loops for
+# ~5.5 hours (step every 2 min in session, every 15 min outside it, polling dashboard commands each
+# step) and then dispatches the next run itself. The cron below is only a backup to restart a broken
+# chain; extra triggers just queue in the concurrency group. To stop everything, disable this workflow.
 # It can never trade live: kavach.cli refuses --live under GitHub Actions.
 name: engine
 on:
   schedule:
-    - cron: "7,37 3-17 * * 1-5"      # 08:37-23:07 IST weekdays (NSE + MCX crude to 23:30), off the :00/:15 rush
+    - cron: "7 1,3,9,15 * * *"       # backup restarts only (06:37, 08:37, 14:37, 20:37 IST)
   issues:
     types: [opened]
   workflow_dispatch:
@@ -17,13 +17,14 @@ concurrency:
 permissions:
   contents: write
   issues: write
+  actions: write          # to dispatch the next run in the chain
 jobs:
   run:
     if: >-
       github.event_name != 'issues' ||
       (github.event.issue.user.login == github.repository_owner && startsWith(github.event.issue.title, 'kavach:'))
     runs-on: ubuntu-latest
-    timeout-minutes: 65
+    timeout-minutes: 350
     steps:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
@@ -37,9 +38,9 @@ jobs:
           touch pages/.nojekyll
           git -C pages config user.name "kavach-bot"
           git -C pages config user.email "kavach-bot@users.noreply.github.com"
-      - name: engine loop (every 2 min, up to 58 min; NSE + MCX sessions)
+      - name: engine loop (2 min in session, 15 min outside; ~5.5 h, then chains the next run)
         env:
           KAVACH_STATE: pages/state
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           UPSTOX_ANALYTICS_TOKEN: ${{ secrets.UPSTOX_ANALYTICS_TOKEN }}
-        run: python -m kavach.cli loop --site pages --push --github-commands --strategy fly_hold --every 120 --max-minutes 58
+        run: python -m kavach.cli loop --site pages --push --github-commands --strategy fly_hold --every 120 --max-minutes 330 --chain

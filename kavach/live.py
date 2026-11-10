@@ -164,7 +164,7 @@ class Engine:
         done = []
         for leg in sorted(legs, key=lambda l: 0 if l.side == "BUY" else 1):
             fill, lg = None, None
-            for aggress in (0.3, 0.7, 1.0):
+            for aggress in (0.3, 0.7, 1.0, 1.5):   # 1.5 crosses the touch: last try fills
                 lg = self._leg(self.b.chain(expiry), leg.cp, leg.strike, expiry, leg.side, leg.lots, aggress)
                 chk = self.g.check_exit([lg])
                 if not chk.ok:
@@ -191,7 +191,7 @@ class Engine:
             if L["lots"] <= 0:
                 continue
             side = "SELL" if L["side"] == "BUY" else "BUY"
-            for aggress in (0.7, 1.0, 1.0):
+            for aggress in (0.7, 1.0, 1.5, 2.0):
                 lg = self._leg(self.b.chain(expiry), L["cp"], L["strike"], expiry, side, L["lots"], aggress)
                 self.g.wait_rate()
                 if self.b.place(lg)["status"] == "FILLED":
@@ -300,6 +300,7 @@ class Engine:
 
     # ---------------- commands (from dashboard / GitHub issues) ----------------
     def command(self, name: str, arg: str, now: dt.datetime) -> str:
+        getattr(self.b, "refresh", lambda: None)()   # fresh quote snapshot per step/command
         name = name.lower()
         if name == "pause":
             self.es["paused"] = True; msg = "paused: no new entries"
@@ -392,6 +393,7 @@ class Engine:
 
     # ---------------- main step ----------------
     def step(self, now: dt.datetime | None = None) -> str:
+        getattr(self.b, "refresh", lambda: None)()   # fresh quote snapshot per step/command
         now = now or dt.datetime.now(IST)
         self.es["last_step"] = now.isoformat(timespec="seconds")
         try:
