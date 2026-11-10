@@ -2,16 +2,16 @@
  "entered_cycle": null,
  "paused": false,
  "pending": null,
- "last_step": "2026-11-10T03:07:49+05:30",
+ "last_step": "2026-11-10T16:29:18+05:30",
  "last_signal": {
-  "asof": "2026-11-06",
-  "rv_fcst": 17.875883750418915,
-  "stress": true,
-  "vix": 17.469999313354492,
-  "vix_ch5": 0.13263224397697915,
-  "ret5": 0.08228883926630814,
+  "asof": "2026-11-09",
+  "rv_fcst": 16.144898772430434,
+  "stress": false,
+  "vix": 17.420000076293945,
+  "vix_ch5": 0.11677895187883136,
+  "ret5": 0.06618212031591497,
   "dd20": 0.0,
-  "spot_close": 25030.349609375
+  "spot_close": 25044.650390625
  },
  "last_iv": null,
  "strategy": "fly_1.0_hold"
