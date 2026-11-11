@@ -83,7 +83,7 @@
    "credit": 4037.0430846648787,
    "max_loss": 7962.956915335126,
    "tp_rs": 2422.2258507989272,
-   "last_mtm": 377.13275748485336,
+   "last_mtm": 380.13068804640875,
    "lots": 1
   }
  ],
@@ -105,7 +105,7 @@
    "crude -17.7% below 20-day high"
   ]
  },
- "last_step": "2026-11-11T18:43:04+05:30",
+ "last_step": "2026-11-11T18:45:06+05:30",
  "last_reason": {
   "main": "main: no proposal (stress: crude -17.7% below 20-day high)"
  },
