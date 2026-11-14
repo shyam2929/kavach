@@ -32,7 +32,7 @@ h2.inline{display:inline;margin:0}
 .pos{color:var(--green)}.neg{color:var(--red)}
 .muted{color:var(--muted)}.small{font-size:12.5px}
 .banner{max-width:1180px;margin:12px auto 0;padding:10px 16px;border-radius:8px;border:1px solid var(--line);background:var(--card);display:flex;gap:10px;align-items:center}
-.banner.bad{border-color:var(--red)}.banner.warn{border-color:var(--amber)}.banner.info{border-color:var(--blue)}
+.banner.bad{border-color:var(--red)}.banner.warn{border-color:var(--amber)}.banner.info{border-color:var(--blue)}.banner.ok{border-color:var(--green, #3a7d44)}
 .banner b{white-space:nowrap}
 .sig{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
 .sig div{background:var(--soft);border-radius:8px;padding:8px 10px}

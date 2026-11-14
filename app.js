@@ -79,6 +79,18 @@
     $("#pills").innerHTML = pills.join("");
 
     const b = [];
+    {
+      const ist = new Date(Date.now() + (330 + new Date().getTimezoneOffset()) * 60000);
+      const hm = ist.getHours() * 60 + ist.getMinutes(), wd = ist.getDay();
+      const inSession = wd >= 1 && wd <= 5 && hm >= 9 * 60 && hm <= 23 * 60 + 30;
+      const staleMin = (Date.now() - new Date(s.updated).getTime()) / 60000;
+      if (inSession && staleMin > 10) b.push(`<div class="banner bad"><b>Engine not running</b><span>Last update ${ago(s.updated)}. Proposals, accepts and position management are stalled until the runner restarts (it restarts itself; if this persists, run the <i>engine</i> workflow from the repo's Actions tab).</span></div>`);
+    }
+    for (const a of (s.actions || []).slice(-3).reverse()) {
+      if (Date.now() - new Date(a.ts).getTime() > 36 * 3600e3) continue;
+      const bad = /fail|expired|no matching|blocked|error|refus/i.test(a.result);
+      b.push(`<div class="banner ${bad ? "bad" : "ok"}"><b>Your ${esc(a.cmd)}${a.arg ? " " + esc(a.arg) : ""}</b><span>${esc(a.result)} <span class="muted">· ${esc(a.ts.slice(0, 16).replace("T", " "))} IST</span></span></div>`);
+    }
     if (s.halted) b.push(`<div class="banner bad"><b>HALTED</b><span>${esc(s.halt_reason)}. No new entries until you reset the halt (Controls → human-only).</span></div>`);
     if (s.paused) b.push(`<div class="banner warn"><b>Paused</b><span>New entries are paused. Open positions are still managed.</span></div>`);
     if (s.training && s.training.pending) b.push(`<div class="banner info"><b>Trade to accept</b><span>Training trade ${esc(s.training.pending.id)}: ${esc(s.training.pending.strategy)} ×1, expiry ${esc(s.training.pending.expiry)}, worst case ${inr(s.training.pending.max_loss)}. See the Training book below.</span></div>`);
