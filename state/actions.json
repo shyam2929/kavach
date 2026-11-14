@@ -1,0 +1,16 @@
+[
+ {
+  "ts": "2026-11-10T17:50:56+05:30",
+  "cmd": "approve",
+  "arg": "CT9bc59",
+  "result": "execution failed; legs unwound (the SELL PE 7700 leg was not filled because of a paper-broker quote bug, now fixed). No position was opened.",
+  "issue": 4
+ },
+ {
+  "ts": "2026-11-10T17:53:12+05:30",
+  "cmd": "approve",
+  "arg": "CT9bc59",
+  "result": "no matching crude proposal (already used by the first click)",
+  "issue": 5
+ }
+]
