@@ -2,7 +2,7 @@
  "entered_cycle": null,
  "paused": false,
  "pending": null,
- "last_step": "2026-11-16T09:14:15+05:30",
+ "last_step": "2026-11-16T09:16:17+05:30",
  "last_signal": {
   "asof": "2026-11-13",
   "rv_fcst": 15.31967956574072,
@@ -14,5 +14,6 @@
   "spot_close": 25144.30078125
  },
  "last_iv": null,
- "strategy": "fly_1.0_hold"
+ "strategy": "fly_1.0_hold",
+ "last_reason": "training: no proposal (outside entry window 09:45-14:30)"
 }
