@@ -18,3 +18,4 @@
 2026-11-13 21:01:20 [crude] OPENED CT2ebdb (training) exp 2026-12-16 credit Rs 3,448 worst case Rs 8,052
 2026-11-13 21:01:20 [crude] main: no proposal (stress: crude -15.1% below 20-day high)
 2026-11-16 09:16:17 training: no proposal (outside entry window 09:45-14:30)
+2026-11-16 09:46:43 TRAINING PROPOSAL T885d7 fly_1.0_hold exp 2026-11-23 credit Rs 23,715 worst case Rs 15,285 [no premium (IV 15.1 < RV fcst 15.3)]

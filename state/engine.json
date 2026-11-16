@@ -2,7 +2,7 @@
  "entered_cycle": null,
  "paused": false,
  "pending": null,
- "last_step": "2026-11-16T09:44:42+05:30",
+ "last_step": "2026-11-16T09:46:43+05:30",
  "last_signal": {
   "asof": "2026-11-13",
   "rv_fcst": 15.31967956574072,
@@ -15,5 +15,71 @@
  },
  "last_iv": null,
  "strategy": "fly_1.0_hold",
- "last_reason": "training: no proposal (outside entry window 09:45-14:30)"
+ "last_reason": "training: no proposal (outside entry window 09:45-14:30)",
+ "data_pending": {
+  "id": "T885d7",
+  "kind": "training",
+  "created": "2026-11-16T09:46+05:30",
+  "valid_until": "2026-11-16T14:30",
+  "expiry": "2026-11-23",
+  "td_left": 5,
+  "strategy": "fly_1.0_hold",
+  "lots": 1,
+  "spot": 25317.75,
+  "atm_iv": 0.15089159829286974,
+  "credit": 23715.25,
+  "max_loss": 15284.750000000116,
+  "take_profit": 0.8,
+  "stop": 1.01,
+  "gate_open": false,
+  "gate_reason": "no premium (IV 15.1 < RV fcst 15.3)",
+  "signal": {
+   "asof": "2026-11-13",
+   "rv_fcst": 15.31967956574072,
+   "stress": false,
+   "vix": 15.5,
+   "vix_ch5": -0.005148011620485615,
+   "ret5": 0.02446539731402453,
+   "dd20": -0.006128569726849609,
+   "spot_close": 25144.30078125
+  },
+  "legs": [
+   {
+    "cp": "P",
+    "strike": 24750.0,
+    "side": "BUY",
+    "lots": 1,
+    "limit": 58.75,
+    "bid": 58.35129086828268,
+    "ask": 58.93773600263729
+   },
+   {
+    "cp": "C",
+    "strike": 25950.0,
+    "side": "BUY",
+    "lots": 1,
+    "limit": 42.6,
+    "bid": 42.246658601298456,
+    "ask": 42.746658601298456
+   },
+   {
+    "cp": "P",
+    "strike": 25350.0,
+    "side": "SELL",
+    "lots": 1,
+    "limit": 234.55,
+    "bid": 233.7700304393417,
+    "ask": 236.1194779814456
+   },
+   {
+    "cp": "C",
+    "strike": 25350.0,
+    "side": "SELL",
+    "lots": 1,
+    "limit": 231.65,
+    "bid": 230.84207310746723,
+    "ask": 233.16209394271817
+   }
+  ]
+ }
 }
