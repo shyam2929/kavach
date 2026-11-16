@@ -12,5 +12,12 @@
   "arg": "CT9bc59",
   "result": "no matching crude proposal (already used by the first click)",
   "issue": 5
+ },
+ {
+  "ts": "2026-11-16T19:29:24+05:30",
+  "cmd": "approve",
+  "arg": "CT6db07",
+  "result": "crude training trade CT6db07 opened",
+  "issue": 9
  }
 ]

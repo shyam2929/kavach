@@ -1,59 +1,6 @@
 {
  "pending": {
-  "training": {
-   "id": "CT6db07",
-   "book": "training",
-   "created": "2026-11-16T10:00+05:30",
-   "valid_until": "2026-11-16T22:00",
-   "expiry": "2026-12-16",
-   "td_left": 22,
-   "strategy": "crude condor 0.6/1.5 sigma",
-   "lots": 1,
-   "spot": 8321.762137683108,
-   "atm_iv": 0.4985686106425265,
-   "credit": 3216.0,
-   "max_loss": 7784.000000000004,
-   "gate_open": false,
-   "gate_reason": "stress: crude -15.9% below 20-day high",
-   "legs": [
-    {
-     "cp": "P",
-     "strike": 6500.0,
-     "side": "BUY",
-     "lots": 1,
-     "limit": 30.4,
-     "bid": 29.06871635215774,
-     "ask": 31.06871635215774
-    },
-    {
-     "cp": "C",
-     "strike": 10100.0,
-     "side": "BUY",
-     "lots": 1,
-     "limit": 48.2,
-     "bid": 46.852368594665556,
-     "ask": 48.852368594665556
-    },
-    {
-     "cp": "P",
-     "strike": 7600.0,
-     "side": "SELL",
-     "lots": 1,
-     "limit": 193.3,
-     "bid": 191.26981192060097,
-     "ask": 197.09528842579695
-    },
-    {
-     "cp": "C",
-     "strike": 9050.0,
-     "side": "SELL",
-     "lots": 1,
-     "limit": 206.9,
-     "bid": 204.71864740230137,
-     "ask": 210.95373310998565
-    }
-   ]
-  }
+  "training": null
  },
  "positions": [
   {
@@ -136,7 +83,7 @@
    "credit": 4037.0430846648787,
    "max_loss": 7962.956915335126,
    "tp_rs": 2422.2258507989272,
-   "last_mtm": 1042.7569584093026,
+   "last_mtm": 1042.1673280440036,
    "lots": 1
   },
   {
@@ -219,12 +166,95 @@
    "credit": 3448.49418225775,
    "max_loss": 8051.505817742254,
    "tp_rs": 2069.0965093546497,
-   "last_mtm": 282.5645150764708,
+   "last_mtm": 282.35580947301116,
+   "lots": 1
+  },
+  {
+   "id": "CT6db07",
+   "book": "training",
+   "expiry": "2026-12-16",
+   "td_left": 22,
+   "strategy": "crude condor 0.6/1.5 sigma",
+   "spot": 8321.762137683108,
+   "atm_iv": 0.4985686106425265,
+   "gate_open": false,
+   "gate_reason": "stress: crude -15.9% below 20-day high",
+   "opened": "2026-11-16T19:29+05:30",
+   "fills": [
+    {
+     "leg": {
+      "cp": "P",
+      "strike": 6500.0,
+      "expiry": "2026-12-16",
+      "side": "BUY",
+      "lots": 1,
+      "limit_price": 35.4,
+      "bid": 33.31540241509422,
+      "ask": 35.31540241509422,
+      "security_id": "SYN-CRUDEOILM-2026-12-16-6500-P",
+      "underlying": "CRUDEOILM",
+      "lot_size": 10
+     },
+     "price": 35.31540241509422
+    },
+    {
+     "leg": {
+      "cp": "C",
+      "strike": 10100.0,
+      "expiry": "2026-12-16",
+      "side": "BUY",
+      "lots": 1,
+      "limit_price": 40.7,
+      "bid": 38.669448471521655,
+      "ask": 40.669448471521655,
+      "security_id": "SYN-CRUDEOILM-2026-12-16-10100-C",
+      "underlying": "CRUDEOILM",
+      "lot_size": 10
+     },
+     "price": 40.669448471521655
+    },
+    {
+     "leg": {
+      "cp": "P",
+      "strike": 7600.0,
+      "expiry": "2026-12-16",
+      "side": "SELL",
+      "lots": 1,
+      "limit_price": 213.2,
+      "bid": 213.27468289308237,
+      "ask": 219.77035851419149,
+      "security_id": "SYN-CRUDEOILM-2026-12-16-7600-P",
+      "underlying": "CRUDEOILM",
+      "lot_size": 10
+     },
+     "price": 213.27468289308237
+    },
+    {
+     "leg": {
+      "cp": "C",
+      "strike": 9050.0,
+      "expiry": "2026-12-16",
+      "side": "SELL",
+      "lots": 1,
+      "limit_price": 177.7,
+      "bid": 177.75643266019736,
+      "ask": 183.1703341625384,
+      "security_id": "SYN-CRUDEOILM-2026-12-16-9050-C",
+      "underlying": "CRUDEOILM",
+      "lot_size": 10
+     },
+     "price": 177.75643266019736
+    }
+   ],
+   "credit": 3150.4626466666386,
+   "max_loss": 7849.537353333369,
+   "tp_rs": 1890.277587999983,
+   "last_mtm": -159.05792488581193,
    "lots": 1
   }
  ],
  "last_day": {
-  "training": "2026-11-13"
+  "training": "2026-11-16"
  },
  "paused": false,
  "signal": {
@@ -241,7 +271,7 @@
    "crude -17.0% below 20-day high"
   ]
  },
- "last_step": "2026-11-16T19:27:22+05:30",
+ "last_step": "2026-11-16T19:29:24+05:30",
  "last_reason": {
   "main": "main: no proposal (stress: crude -17.0% below 20-day high)"
  },
