@@ -35,3 +35,5 @@
 2026-11-17 18:16:19 [crude] OPENED CTc8975 (training) exp 2026-12-16 credit Rs 2,982 worst case Rs 7,018
 2026-11-17 18:16:19 COMMAND approve CTc8975 -> crude training trade CTc8975 opened
 2026-11-17 21:45:08 [crude] main: no proposal (stress: crude -18.2% below 20-day high)
+2026-11-18 09:16:16 GOVERNOR BLOCKED: outside entry window 09:45-14:30
+2026-11-18 09:16:16 training: no proposal (outside entry window 09:45-14:30)
