@@ -67,3 +67,5 @@
 2026-11-18 09:44:44 training: no proposal (outside entry window 09:45-14:30)
 2026-11-18 09:46:46 PROPOSAL 54ab60 fly_1.0_hold x1 credit Rs 18,886 worst case Rs 13,614
 2026-11-18 09:46:46 TRAINING PROPOSAL T54ab6 fly_1.0_hold exp 2026-11-23 credit Rs 18,886 worst case Rs 13,614 [gates open]
+2026-11-18 10:00:58 [crude] main: no proposal (stress: crude -19.8% below 20-day high)
+2026-11-18 10:00:58 [crude] PROPOSAL CT55a49 (training) exp 2026-12-16 credit Rs 2,846 worst case Rs 6,654 [stress: crude -19.8% below 20-day high]
