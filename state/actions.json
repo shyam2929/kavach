@@ -26,5 +26,19 @@
   "arg": "CTc8975",
   "result": "crude training trade CTc8975 opened",
   "issue": 10
+ },
+ {
+  "ts": "2026-11-18T14:59:59+05:30",
+  "cmd": "approve",
+  "arg": "b524dc",
+  "result": "governor blocked at approval: ['outside entry window 09:45-14:30']",
+  "issue": 11
+ },
+ {
+  "ts": "2026-11-18T14:59:59+05:30",
+  "cmd": "approve",
+  "arg": "CT55a49",
+  "result": "crude training trade CT55a49 opened",
+  "issue": 12
  }
 ]
