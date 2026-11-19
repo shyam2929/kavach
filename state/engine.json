@@ -2,7 +2,7 @@
  "entered_cycle": null,
  "paused": false,
  "pending": null,
- "last_step": "2026-11-19T09:14:20+05:30",
+ "last_step": "2026-11-19T09:16:22+05:30",
  "last_signal": {
   "asof": "2026-11-17",
   "rv_fcst": 14.355309390243152,
@@ -17,7 +17,7 @@
  },
  "last_iv": null,
  "strategy": "fly_1.0_hold",
- "last_reason": "GOVERNOR BLOCKED: outside entry window 09:45-14:30",
+ "last_reason": "training: no proposal (outside entry window 09:45-14:30)",
  "data_pending": null,
  "data_last_day": "2026-11-18"
 }
