@@ -94,3 +94,5 @@
 2026-11-19 11:45:51 [crude] main: no proposal (stress: crude -8.1% in 5 days; crude -22.4% below 20-day high)
 2026-11-19 14:30:56 training proposal Tcb226 expired unapproved
 2026-11-19 17:14:34 [crude] main: no proposal (stress: crude -8.8% in 5 days; crude -22.9% below 20-day high)
+2026-11-19 20:47:07 [crude] OPENED CTb6db5 (training) exp 2026-12-16 credit Rs 2,825 worst case Rs 6,675
+2026-11-19 20:47:07 COMMAND approve CTb6db5 -> crude training trade CTb6db5 opened
