@@ -88,3 +88,4 @@
 2026-11-18 14:59:59 COMMAND approve CT55a49 -> crude training trade CT55a49 opened
 2026-11-18 14:59:59 GOVERNOR BLOCKED: outside entry window 09:45-14:30
 2026-11-19 09:16:22 training: no proposal (outside entry window 09:45-14:30)
+2026-11-19 09:47:00 TRAINING PROPOSAL Tcb226 fly_1.0_hold exp 2026-11-23 credit Rs 16,071 worst case Rs 9,929 [gates open]
