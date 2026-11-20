@@ -97,3 +97,5 @@
 2026-11-19 20:47:07 [crude] OPENED CTb6db5 (training) exp 2026-12-16 credit Rs 2,825 worst case Rs 6,675
 2026-11-19 20:47:07 COMMAND approve CTb6db5 -> crude training trade CTb6db5 opened
 2026-11-20 09:45:39 TRAINING PROPOSAL T4437f fly_1.0_hold exp 2026-12-01 credit Rs 27,878 worst case Rs 17,622 [gates open]
+2026-11-20 10:01:55 [crude] main: no proposal (stress: crude -7.6% in 5 days; crude -21.9% below 20-day high)
+2026-11-20 10:01:55 [crude] PROPOSAL CT5a1ff (training) exp 2026-12-16 credit Rs 2,848 worst case Rs 6,652 [stress: crude -7.6% in 5 days; crude -21.9% below 20-day high]

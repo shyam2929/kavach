@@ -1,6 +1,59 @@
 {
  "pending": {
-  "training": null
+  "training": {
+   "id": "CT5a1ff",
+   "book": "training",
+   "created": "2026-11-20T10:01+05:30",
+   "valid_until": "2026-11-20T22:00",
+   "expiry": "2026-12-16",
+   "td_left": 18,
+   "strategy": "crude condor 0.6/1.5 sigma",
+   "lots": 1,
+   "spot": 7725.224746704102,
+   "atm_iv": 0.5009038296915207,
+   "credit": 2848.0,
+   "max_loss": 6652.0,
+   "gate_open": false,
+   "gate_reason": "stress: crude -7.6% in 5 days; crude -21.9% below 20-day high",
+   "legs": [
+    {
+     "cp": "P",
+     "strike": 6150.0,
+     "side": "BUY",
+     "lots": 1,
+     "limit": 28.1,
+     "bid": 26.705882713287235,
+     "ask": 28.705882713287235
+    },
+    {
+     "cp": "C",
+     "strike": 9300.0,
+     "side": "BUY",
+     "lots": 1,
+     "limit": 39.3,
+     "bid": 37.95198133342206,
+     "ask": 39.95198133342206
+    },
+    {
+     "cp": "P",
+     "strike": 7100.0,
+     "side": "SELL",
+     "lots": 1,
+     "limit": 170.3,
+     "bid": 168.5066216617277,
+     "ask": 173.63880303213568
+    },
+    {
+     "cp": "C",
+     "strike": 8350.0,
+     "side": "SELL",
+     "lots": 1,
+     "limit": 181.9,
+     "bid": 180.05843815590532,
+     "ask": 185.54245150075525
+    }
+   ]
+  }
  },
  "positions": [
   {
@@ -83,7 +136,7 @@
    "credit": 4037.0430846648787,
    "max_loss": 7962.956915335126,
    "tp_rs": 2422.2258507989272,
-   "last_mtm": 1155.9804484831634,
+   "last_mtm": 1151.0310566811565,
    "lots": 1
   },
   {
@@ -166,7 +219,7 @@
    "credit": 3448.49418225775,
    "max_loss": 8051.505817742254,
    "tp_rs": 2069.0965093546497,
-   "last_mtm": 173.34175724986062,
+   "last_mtm": 167.03102764621053,
    "lots": 1
   },
   {
@@ -249,7 +302,7 @@
    "credit": 3150.4626466666386,
    "max_loss": 7849.537353333369,
    "tp_rs": 1890.277587999983,
-   "last_mtm": -403.05044615032807,
+   "last_mtm": -410.0087744333932,
    "lots": 1
   },
   {
@@ -332,7 +385,7 @@
    "credit": 2981.8805243671122,
    "max_loss": 7018.119475632899,
    "tp_rs": 1789.1283146202672,
-   "last_mtm": 5.135210023800255,
+   "last_mtm": 2.9690059487930966,
    "lots": 1
   },
   {
@@ -415,7 +468,7 @@
    "credit": 2789.9060686110915,
    "max_loss": 6710.09393138891,
    "tp_rs": 1673.943641166655,
-   "last_mtm": -70.07973340259255,
+   "last_mtm": -71.5354430254387,
    "lots": 1
   },
   {
@@ -498,7 +551,7 @@
    "credit": 2824.6989903032763,
    "max_loss": 6675.301009696726,
    "tp_rs": 1694.8193941819657,
-   "last_mtm": -88.4476400097169,
+   "last_mtm": -86.48718760912982,
    "lots": 1
   }
  ],
@@ -521,9 +574,9 @@
    "crude -21.9% below 20-day high"
   ]
  },
- "last_step": "2026-11-20T09:59:53+05:30",
+ "last_step": "2026-11-20T10:01:55+05:30",
  "last_reason": {
-  "main": "main: no proposal (stress: crude -8.8% in 5 days; crude -22.9% below 20-day high)"
+  "main": "main: no proposal (stress: crude -7.6% in 5 days; crude -21.9% below 20-day high)"
  },
  "paper_trades": 0
 }
