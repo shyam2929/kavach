@@ -104,3 +104,5 @@
 2026-11-20 20:31:58 [crude] main: no proposal (stress: crude -9.8% in 5 days; crude -23.8% below 20-day high)
 2026-11-20 22:01:26 [crude] training proposal CT5a1ff lapsed
 2026-11-23 09:46:40 TRAINING PROPOSAL T29839 fly_1.0_hold exp 2026-12-01 credit Rs 27,521 worst case Rs 17,979 [gates open]
+2026-11-23 10:00:50 [crude] main: no proposal (stress: crude -6.1% in 5 days; crude -20.9% below 20-day high)
+2026-11-23 10:00:50 [crude] PROPOSAL CTad789 (training) exp 2026-12-16 credit Rs 2,896 worst case Rs 6,604 [stress: crude -6.1% in 5 days; crude -20.9% below 20-day high]
