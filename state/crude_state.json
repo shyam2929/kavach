@@ -510,18 +510,18 @@
   "asof": "2026-11-20",
   "ovx": 54.119998931884766,
   "ovx_ch5": 0.07359642412259203,
-  "ret5": -0.0677997876050527,
-  "dd20": -0.21454267167982555,
-  "wti": 83.41000366210938,
+  "ret5": -0.060989322534433225,
+  "dd20": -0.2091750848463133,
+  "wti": 83.9800033569336,
   "inr": 93.29499816894531,
-  "mcx": 7781.736138928216,
+  "mcx": 7834.914259413141,
   "stress": true,
   "stress_reasons": [
-   "crude -6.8% in 5 days",
-   "crude -21.5% below 20-day high"
+   "crude -6.1% in 5 days",
+   "crude -20.9% below 20-day high"
   ]
  },
- "last_step": "2026-11-23T07:00:53+05:30",
+ "last_step": "2026-11-23T07:01:28+05:30",
  "last_reason": {
   "main": "main: no proposal (stress: crude -9.8% in 5 days; crude -23.8% below 20-day high)"
  },
