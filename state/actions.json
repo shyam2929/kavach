@@ -47,5 +47,19 @@
   "arg": "CTb6db5",
   "result": "crude training trade CTb6db5 opened",
   "issue": 13
+ },
+ {
+  "ts": "2026-11-23T10:04:54+05:30",
+  "cmd": "approve",
+  "arg": "T29839",
+  "result": "training trade T29839 opened",
+  "issue": 14
+ },
+ {
+  "ts": "2026-11-23T10:04:54+05:30",
+  "cmd": "approve",
+  "arg": "CTad789",
+  "result": "crude training trade CTad789 opened",
+  "issue": 15
  }
 ]

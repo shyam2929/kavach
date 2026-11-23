@@ -1,59 +1,6 @@
 {
  "pending": {
-  "training": {
-   "id": "CTad789",
-   "book": "training",
-   "created": "2026-11-23T10:00+05:30",
-   "valid_until": "2026-11-23T22:00",
-   "expiry": "2026-12-16",
-   "td_left": 17,
-   "strategy": "crude condor 0.6/1.5 sigma",
-   "lots": 1,
-   "spot": 7767.577775514219,
-   "atm_iv": 0.5350924857206126,
-   "credit": 2896.0,
-   "max_loss": 6604.000000000002,
-   "gate_open": false,
-   "gate_reason": "stress: crude -6.1% in 5 days; crude -20.9% below 20-day high",
-   "legs": [
-    {
-     "cp": "P",
-     "strike": 6200.0,
-     "side": "BUY",
-     "lots": 1,
-     "limit": 29.0,
-     "bid": 27.667541334820147,
-     "ask": 29.667541334820147
-    },
-    {
-     "cp": "C",
-     "strike": 9350.0,
-     "side": "BUY",
-     "lots": 1,
-     "limit": 40.7,
-     "bid": 39.35472067591332,
-     "ask": 41.35472067591332
-    },
-    {
-     "cp": "P",
-     "strike": 7150.0,
-     "side": "SELL",
-     "lots": 1,
-     "limit": 175.3,
-     "bid": 173.45205921857365,
-     "ask": 178.73486305264186
-    },
-    {
-     "cp": "C",
-     "strike": 8400.0,
-     "side": "SELL",
-     "lots": 1,
-     "limit": 184.0,
-     "bid": 182.1145991451547,
-     "ask": 187.6612366825706
-    }
-   ]
-  }
+  "training": null
  },
  "positions": [
   {
@@ -136,7 +83,7 @@
    "credit": 4037.0430846648787,
    "max_loss": 7962.956915335126,
    "tp_rs": 2422.2258507989272,
-   "last_mtm": 1178.127902427467,
+   "last_mtm": 1181.3070136742863,
    "lots": 1
   },
   {
@@ -219,7 +166,7 @@
    "credit": 3448.49418225775,
    "max_loss": 8051.505817742254,
    "tp_rs": 2069.0965093546497,
-   "last_mtm": 210.2803212353449,
+   "last_mtm": 214.4631789077987,
    "lots": 1
   },
   {
@@ -302,7 +249,7 @@
    "credit": 3150.4626466666386,
    "max_loss": 7849.537353333369,
    "tp_rs": 1890.277587999983,
-   "last_mtm": -358.75473954956965,
+   "last_mtm": -354.08409071765186,
    "lots": 1
   },
   {
@@ -385,7 +332,7 @@
    "credit": 2981.8805243671122,
    "max_loss": 7018.119475632899,
    "tp_rs": 1789.1283146202672,
-   "last_mtm": -0.9843633122742403,
+   "last_mtm": 0.2395439171907583,
    "lots": 1
   },
   {
@@ -468,7 +415,7 @@
    "credit": 2789.9060686110915,
    "max_loss": 6710.09393138891,
    "tp_rs": 1673.943641166655,
-   "last_mtm": -82.40955408683203,
+   "last_mtm": -81.68677964198842,
    "lots": 1
   },
   {
@@ -551,12 +498,95 @@
    "credit": 2824.6989903032763,
    "max_loss": 6675.301009696726,
    "tp_rs": 1694.8193941819657,
-   "last_mtm": -133.75868665870695,
+   "last_mtm": -135.48853609494358,
+   "lots": 1
+  },
+  {
+   "id": "CTad789",
+   "book": "training",
+   "expiry": "2026-12-16",
+   "td_left": 17,
+   "strategy": "crude condor 0.6/1.5 sigma",
+   "spot": 7767.577775514219,
+   "atm_iv": 0.5350924857206126,
+   "gate_open": false,
+   "gate_reason": "stress: crude -6.1% in 5 days; crude -20.9% below 20-day high",
+   "opened": "2026-11-23T10:04+05:30",
+   "fills": [
+    {
+     "leg": {
+      "cp": "P",
+      "strike": 6200.0,
+      "expiry": "2026-12-16",
+      "side": "BUY",
+      "lots": 1,
+      "limit_price": 29.8,
+      "bid": 27.732055881159404,
+      "ask": 29.732055881159404,
+      "security_id": "SYN-CRUDEOILM-2026-12-16-6200-P",
+      "underlying": "CRUDEOILM",
+      "lot_size": 10
+     },
+     "price": 29.732055881159404
+    },
+    {
+     "leg": {
+      "cp": "C",
+      "strike": 9350.0,
+      "expiry": "2026-12-16",
+      "side": "BUY",
+      "lots": 1,
+      "limit_price": 41.3,
+      "bid": 39.230608533272665,
+      "ask": 41.230608533272665,
+      "security_id": "SYN-CRUDEOILM-2026-12-16-9350-C",
+      "underlying": "CRUDEOILM",
+      "lot_size": 10
+     },
+     "price": 41.230608533272665
+    },
+    {
+     "leg": {
+      "cp": "P",
+      "strike": 7150.0,
+      "expiry": "2026-12-16",
+      "side": "SELL",
+      "lots": 1,
+      "limit_price": 173.7,
+      "bid": 173.77121447866384,
+      "ask": 179.06373877750642,
+      "security_id": "SYN-CRUDEOILM-2026-12-16-7150-P",
+      "underlying": "CRUDEOILM",
+      "lot_size": 10
+     },
+     "price": 173.77121447866384
+    },
+    {
+     "leg": {
+      "cp": "C",
+      "strike": 8400.0,
+      "expiry": "2026-12-16",
+      "side": "SELL",
+      "lots": 1,
+      "limit_price": 181.6,
+      "bid": 181.6982366878183,
+      "ask": 187.23219313516304,
+      "security_id": "SYN-CRUDEOILM-2026-12-16-8400-C",
+      "underlying": "CRUDEOILM",
+      "lot_size": 10
+     },
+     "price": 181.6982366878183
+    }
+   ],
+   "credit": 2845.067867520501,
+   "max_loss": 6654.932132479509,
+   "tp_rs": 1707.0407205123004,
+   "last_mtm": -148.26480746187315,
    "lots": 1
   }
  ],
  "last_day": {
-  "training": "2026-11-20"
+  "training": "2026-11-23"
  },
  "paused": false,
  "signal": {
@@ -574,7 +604,7 @@
    "crude -20.9% below 20-day high"
   ]
  },
- "last_step": "2026-11-23T10:02:52+05:30",
+ "last_step": "2026-11-23T10:04:54+05:30",
  "last_reason": {
   "main": "main: no proposal (stress: crude -6.1% in 5 days; crude -20.9% below 20-day high)"
  },

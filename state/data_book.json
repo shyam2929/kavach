@@ -1,1 +1,96 @@
-[]
+[
+ {
+  "id": "T29839",
+  "expiry": "2026-12-01",
+  "td_left": 5,
+  "strategy": "fly_1.0_hold",
+  "lots": 1,
+  "spot": 25688.150390625,
+  "atm_iv": 0.17626577508707858,
+  "gate_open": true,
+  "gate_reason": "gates open",
+  "signal": {
+   "asof": "2026-11-20",
+   "rv_fcst": 14.79019057297787,
+   "stress": false,
+   "vix": 17.31999969482422,
+   "vix_ch5": 0.1110218615892391,
+   "ret5": 0.0257664705603613,
+   "dd20": 0.0,
+   "spot_close": 25800.599609375,
+   "atm_iv": 0.16738328588404755,
+   "spot": 25220.44921875
+  },
+  "opened": "2026-11-23T10:04+05:30",
+  "fills": [
+   {
+    "leg": {
+     "cp": "P",
+     "strike": 25050.0,
+     "expiry": "2026-12-01",
+     "side": "BUY",
+     "lots": 1,
+     "limit_price": 78.9,
+     "bid": 78.07408495383262,
+     "ask": 78.8587491242229,
+     "security_id": "SYN-2026-12-01-25050-P",
+     "underlying": "NIFTY",
+     "lot_size": 65
+    },
+    "price": 78.8587491242229
+   },
+   {
+    "leg": {
+     "cp": "C",
+     "strike": 26400.0,
+     "expiry": "2026-12-01",
+     "side": "BUY",
+     "lots": 1,
+     "limit_price": 46.45,
+     "bid": 45.94811451018265,
+     "ask": 46.44811451018265,
+     "security_id": "SYN-2026-12-01-26400-C",
+     "underlying": "NIFTY",
+     "lot_size": 65
+    },
+    "price": 46.44811451018265
+   },
+   {
+    "leg": {
+     "cp": "P",
+     "strike": 25700.0,
+     "expiry": "2026-12-01",
+     "side": "SELL",
+     "lots": 1,
+     "limit_price": 286.85,
+     "bid": 286.87504660061154,
+     "ask": 289.75821289810517,
+     "security_id": "SYN-2026-12-01-25700-P",
+     "underlying": "NIFTY",
+     "lot_size": 65
+    },
+    "price": 286.87504660061154
+   },
+   {
+    "leg": {
+     "cp": "C",
+     "strike": 25700.0,
+     "expiry": "2026-12-01",
+     "side": "SELL",
+     "lots": 1,
+     "limit_price": 253.9,
+     "bid": 253.91094948432158,
+     "ask": 256.46281832336,
+     "security_id": "SYN-2026-12-01-25700-C",
+     "underlying": "NIFTY",
+     "lot_size": 65
+    },
+    "price": 253.91094948432158
+   }
+  ],
+  "credit": 27006.143609284292,
+  "max_loss": 18493.85639071581,
+  "tp_rs": 21604.914887427436,
+  "last_mtm": -423.3481071763596
+ }
+]
