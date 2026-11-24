@@ -117,3 +117,5 @@
 2026-11-23 12:31:33 [crude] main: no proposal (stress: crude -22.1% below 20-day high)
 2026-11-23 18:01:21 [crude] main: no proposal (stress: crude -5.5% in 5 days; crude -23.0% below 20-day high)
 2026-11-24 13:17:46 command channel error: <HTTPError 502: 'Bad Gateway'>
+2026-11-24 17:00:59 [crude] main: no proposal (stress: crude -7.8% in 5 days; crude -25.0% below 20-day high)
+2026-11-24 17:00:59 [crude] PROPOSAL CTcb6b7 (training) exp 2026-12-16 credit Rs 2,510 worst case Rs 5,990 [stress: crude -7.8% in 5 days; crude -25.0% below 20-day high]
