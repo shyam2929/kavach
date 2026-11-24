@@ -61,5 +61,12 @@
   "arg": "CTad789",
   "result": "crude training trade CTad789 opened",
   "issue": 15
+ },
+ {
+  "ts": "2026-11-24T21:19:09+05:30",
+  "cmd": "approve",
+  "arg": "CTcb6b7",
+  "result": "crude training trade CTcb6b7 opened",
+  "issue": 16
  }
 ]
