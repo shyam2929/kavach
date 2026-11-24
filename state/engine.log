@@ -116,3 +116,4 @@
 2026-11-23 10:04:54 COMMAND approve CTad789 -> crude training trade CTad789 opened
 2026-11-23 12:31:33 [crude] main: no proposal (stress: crude -22.1% below 20-day high)
 2026-11-23 18:01:21 [crude] main: no proposal (stress: crude -5.5% in 5 days; crude -23.0% below 20-day high)
+2026-11-24 13:17:46 command channel error: <HTTPError 502: 'Bad Gateway'>
