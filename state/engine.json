@@ -2,10 +2,10 @@
  "entered_cycle": null,
  "paused": false,
  "pending": null,
- "last_step": "2026-11-25T03:01:24+05:30",
+ "last_step": "2026-11-25T03:01:59+05:30",
  "last_signal": {
   "asof": "2026-11-23",
-  "rv_fcst": 16.104172326653433,
+  "rv_fcst": 16.104172326653448,
   "stress": true,
   "vix": 17.700000762939453,
   "vix_ch5": 0.12117864829870362,
