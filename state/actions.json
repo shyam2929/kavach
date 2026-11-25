@@ -68,5 +68,26 @@
   "arg": "CTcb6b7",
   "result": "crude training trade CTcb6b7 opened",
   "issue": 16
+ },
+ {
+  "ts": "2026-11-25T14:37:18+05:30",
+  "cmd": "approve",
+  "arg": "CTaeb8f",
+  "result": "crude training trade CTaeb8f opened",
+  "issue": 17
+ },
+ {
+  "ts": "2026-11-25T14:37:18+05:30",
+  "cmd": "approve",
+  "arg": "Tc73e2",
+  "result": "no matching proposal",
+  "issue": 18
+ },
+ {
+  "ts": "2026-11-25T14:37:18+05:30",
+  "cmd": "approve",
+  "arg": "CTaeb8f",
+  "result": "no matching crude proposal",
+  "issue": 19
  }
 ]
