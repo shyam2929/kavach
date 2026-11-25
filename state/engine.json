@@ -2,7 +2,7 @@
  "entered_cycle": null,
  "paused": false,
  "pending": null,
- "last_step": "2026-11-25T14:29:08+05:30",
+ "last_step": "2026-11-25T14:31:10+05:30",
  "last_signal": {
   "asof": "2026-11-25",
   "rv_fcst": 17.78443791373961,
@@ -12,79 +12,12 @@
   "ret5": 0.012619269221513463,
   "dd20": -0.0035192526336483843,
   "spot_close": 25709.80078125,
-  "atm_iv": 0.18655156373701637,
-  "spot": 25737.0
+  "atm_iv": 0.18688440831797715,
+  "spot": 25732.25
  },
  "last_iv": null,
  "strategy": "fly_1.0_hold",
  "last_reason": "no trade: stress regime: short-vol entries blocked",
- "data_pending": {
-  "id": "Tc73e2",
-  "kind": "training",
-  "created": "2026-11-25T09:45+05:30",
-  "valid_until": "2026-11-25T14:30",
-  "expiry": "2026-12-01",
-  "td_left": 4,
-  "strategy": "fly_1.0_hold",
-  "lots": 1,
-  "spot": 25749.30078125,
-  "atm_iv": 0.16344157256648373,
-  "credit": 23328.500000000004,
-  "max_loss": 15671.500000000116,
-  "take_profit": 0.8,
-  "stop": 1.01,
-  "gate_open": false,
-  "gate_reason": "stress regime",
-  "signal": {
-   "asof": "2026-11-23",
-   "rv_fcst": 16.104172326653448,
-   "stress": true,
-   "vix": 17.700000762939453,
-   "vix_ch5": 0.12117864829870362,
-   "ret5": 0.0023123989016831104,
-   "dd20": -0.017478245683334448,
-   "spot_close": 25349.650390625,
-   "atm_iv": 0.1634382625284707,
-   "spot": 25748.900390625
-  },
-  "legs": [
-   {
-    "cp": "P",
-    "strike": 25200.0,
-    "side": "BUY",
-    "lots": 1,
-    "limit": 62.15,
-    "bid": 61.739693054298016,
-    "ask": 62.3601924819794
-   },
-   {
-    "cp": "C",
-    "strike": 26350.0,
-    "side": "BUY",
-    "lots": 1,
-    "limit": 47.9,
-    "bid": 47.54396080053029,
-    "ask": 48.04396080053029
-   },
-   {
-    "cp": "P",
-    "strike": 25800.0,
-    "side": "SELL",
-    "lots": 1,
-    "limit": 247.8,
-    "bid": 246.9435166779412,
-    "ask": 249.4253610666642
-   },
-   {
-    "cp": "C",
-    "strike": 25800.0,
-    "side": "SELL",
-    "lots": 1,
-    "limit": 221.15,
-    "bid": 220.38937051261973,
-    "ask": 222.60433906048524
-   }
-  ]
- },
- "data_last_day": "2026-11-23"
+ "data_pending": null,
+ "data_last_day": "2026-11-25"
 }
