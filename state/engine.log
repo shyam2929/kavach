@@ -122,3 +122,5 @@
 2026-11-24 21:19:09 [crude] OPENED CTcb6b7 (training) exp 2026-12-16 credit Rs 2,491 worst case Rs 6,009
 2026-11-24 21:19:09 COMMAND approve CTcb6b7 -> crude training trade CTcb6b7 opened
 2026-11-24 21:32:11 [crude] main: no proposal (stress: crude -8.4% in 5 days; crude -25.4% below 20-day high)
+2026-11-25 09:16:27 no trade: stress regime: short-vol entries blocked
+2026-11-25 09:16:27 training: no proposal (outside entry window 09:45-14:30)
