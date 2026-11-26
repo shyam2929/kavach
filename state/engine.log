@@ -195,3 +195,5 @@
 2026-11-26 10:01:03 [crude] PROPOSAL CT3aaee (training) exp 2026-12-16 credit Rs 2,392 worst case Rs 5,608 [stress: crude -21.3% below 20-day high]
 2026-11-26 11:31:08 PROPOSAL c7595d fly_1.0_hold x1 credit Rs 21,265 worst case Rs 14,485
 2026-11-26 11:31:08 [crude] main: no proposal (stress: crude -21.0% below 20-day high)
+2026-11-26 12:17:55 proposal c7595d expired unapproved
+2026-11-26 12:17:55 PROPOSAL 1fa30c fly_1.0_hold x1 credit Rs 21,210 worst case Rs 14,541
