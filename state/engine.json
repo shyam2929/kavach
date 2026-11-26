@@ -2,7 +2,7 @@
  "entered_cycle": null,
  "paused": false,
  "pending": null,
- "last_step": "2026-11-26T09:14:17+05:30",
+ "last_step": "2026-11-26T09:16:19+05:30",
  "last_signal": {
   "asof": "2026-11-23",
   "rv_fcst": 16.103165680014513,
@@ -12,12 +12,12 @@
   "ret5": 0.0023123989016831104,
   "dd20": -0.017478245683334448,
   "spot_close": 25349.650390625,
-  "atm_iv": 0.1872834084107594,
-  "spot": 25791.25
+  "atm_iv": 0.16475915683599182,
+  "spot": 25781.900390625
  },
  "last_iv": null,
  "strategy": "fly_1.0_hold",
- "last_reason": "no trade: stress regime: short-vol entries blocked",
+ "last_reason": "training: no proposal (outside entry window 09:45-14:30)",
  "data_pending": null,
  "data_last_day": "2026-11-25"
 }
