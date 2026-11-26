@@ -191,3 +191,5 @@
 2026-11-26 09:44:47 training: no proposal (outside entry window 09:45-14:30)
 2026-11-26 09:46:49 no trade: stress regime: short-vol entries blocked
 2026-11-26 09:46:49 TRAINING PROPOSAL T6a157 fly_1.0_hold exp 2026-12-01 credit Rs 21,297 worst case Rs 14,453 [stress regime]
+2026-11-26 10:01:03 [crude] main: no proposal (stress: crude -21.3% below 20-day high)
+2026-11-26 10:01:03 [crude] PROPOSAL CT3aaee (training) exp 2026-12-16 credit Rs 2,392 worst case Rs 5,608 [stress: crude -21.3% below 20-day high]
