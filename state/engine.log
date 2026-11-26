@@ -189,3 +189,5 @@
 2026-11-26 09:42:45 training: no proposal (outside entry window 09:45-14:30)
 2026-11-26 09:44:47 no trade: stress regime: short-vol entries blocked
 2026-11-26 09:44:47 training: no proposal (outside entry window 09:45-14:30)
+2026-11-26 09:46:49 no trade: stress regime: short-vol entries blocked
+2026-11-26 09:46:49 TRAINING PROPOSAL T6a157 fly_1.0_hold exp 2026-12-01 credit Rs 21,297 worst case Rs 14,453 [stress regime]

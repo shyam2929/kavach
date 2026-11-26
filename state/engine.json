@@ -2,7 +2,7 @@
  "entered_cycle": null,
  "paused": false,
  "pending": null,
- "last_step": "2026-11-26T09:44:47+05:30",
+ "last_step": "2026-11-26T09:46:49+05:30",
  "last_signal": {
   "asof": "2026-11-23",
   "rv_fcst": 16.103165680014513,
@@ -12,12 +12,79 @@
   "ret5": 0.0023123989016831104,
   "dd20": -0.017478245683334448,
   "spot_close": 25349.650390625,
-  "atm_iv": 0.16529479953362958,
-  "spot": 25757.900390625
+  "atm_iv": 0.16645114674143613,
+  "spot": 25747.30078125
  },
  "last_iv": null,
  "strategy": "fly_1.0_hold",
- "last_reason": "training: no proposal (outside entry window 09:45-14:30)",
- "data_pending": null,
+ "last_reason": "no trade: stress regime: short-vol entries blocked",
+ "data_pending": {
+  "id": "T6a157",
+  "kind": "training",
+  "created": "2026-11-26T09:46+05:30",
+  "valid_until": "2026-11-26T14:30",
+  "expiry": "2026-12-01",
+  "td_left": 3,
+  "strategy": "fly_1.0_hold",
+  "lots": 1,
+  "spot": 25747.0,
+  "atm_iv": 0.16645534252763705,
+  "credit": 21297.25,
+  "max_loss": 14452.750000000058,
+  "take_profit": 0.8,
+  "stop": 1.01,
+  "gate_open": false,
+  "gate_reason": "stress regime",
+  "signal": {
+   "asof": "2026-11-23",
+   "rv_fcst": 16.103165680014513,
+   "stress": true,
+   "vix": 17.700000762939453,
+   "vix_ch5": 0.12117864829870362,
+   "ret5": 0.0023123989016831104,
+   "dd20": -0.017478245683334448,
+   "spot_close": 25349.650390625,
+   "atm_iv": 0.16645114674143613,
+   "spot": 25747.30078125
+  },
+  "legs": [
+   {
+    "cp": "P",
+    "strike": 25250.0,
+    "side": "BUY",
+    "lots": 1,
+    "limit": 56.5,
+    "bid": 56.128553456130234,
+    "ask": 56.69265952101597
+   },
+   {
+    "cp": "C",
+    "strike": 26300.0,
+    "side": "BUY",
+    "lots": 1,
+    "limit": 41.5,
+    "bid": 41.133894693698494,
+    "ask": 41.633894693698494
+   },
+   {
+    "cp": "P",
+    "strike": 25750.0,
+    "side": "SELL",
+    "lots": 1,
+    "limit": 204.7,
+    "bid": 204.02819754511248,
+    "ask": 206.0787321938071
+   },
+   {
+    "cp": "C",
+    "strike": 25750.0,
+    "side": "SELL",
+    "lots": 1,
+    "limit": 220.95,
+    "bid": 220.19292749144932,
+    "ask": 222.40592173759455
+   }
+  ]
+ },
  "data_last_day": "2026-11-25"
 }
