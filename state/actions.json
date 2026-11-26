@@ -89,5 +89,12 @@
   "arg": "CTaeb8f",
   "result": "no matching crude proposal",
   "issue": 19
+ },
+ {
+  "ts": "2026-11-26T15:19:05+05:30",
+  "cmd": "approve",
+  "arg": "CT3aaee",
+  "result": "crude training trade CT3aaee opened",
+  "issue": 20
  }
 ]
