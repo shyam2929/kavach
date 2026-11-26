@@ -2,7 +2,7 @@
  "entered_cycle": null,
  "paused": false,
  "pending": null,
- "last_step": "2026-11-26T14:52:37+05:30",
+ "last_step": "2026-11-26T14:54:39+05:30",
  "last_signal": {
   "asof": "2026-11-26",
   "rv_fcst": 15.532634963712344,
@@ -12,8 +12,8 @@
   "ret5": 0.026348406179437234,
   "dd20": 0.0,
   "spot_close": 25901.5,
-  "atm_iv": 0.1802420881551286,
-  "spot": 25912.650390625
+  "atm_iv": 0.18092809230844395,
+  "spot": 25892.099609375
  },
  "last_iv": null,
  "strategy": "fly_1.0_hold",
