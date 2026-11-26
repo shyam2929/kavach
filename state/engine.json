@@ -1,59 +1,8 @@
 {
  "entered_cycle": null,
  "paused": false,
- "pending": {
-  "id": "396a29",
-  "created": "2026-11-26T13:47+05:30",
-  "expiry": "2026-12-01",
-  "strategy": "fly_1.0_hold",
-  "lots": 1,
-  "spot": 25853.19921875,
-  "atm_iv": 0.1779154079449224,
-  "cap_frac": 0.35,
-  "credit": 21108.75,
-  "max_loss": 14641.250000000116,
-  "take_profit": 0.8,
-  "stop": 1.01,
-  "legs": [
-   {
-    "cp": "P",
-    "strike": 25350.0,
-    "side": "BUY",
-    "lots": 1,
-    "limit": 53.2,
-    "bid": 52.84431572394867,
-    "ask": 53.37541437444061
-   },
-   {
-    "cp": "C",
-    "strike": 26400.0,
-    "side": "BUY",
-    "lots": 1,
-    "limit": 39.85,
-    "bid": 39.51118803747052,
-    "ask": 40.01118803747052
-   },
-   {
-    "cp": "P",
-    "strike": 25850.0,
-    "side": "SELL",
-    "lots": 1,
-    "limit": 197.8,
-    "bid": 197.12801004054074,
-    "ask": 199.10919607109895
-   },
-   {
-    "cp": "C",
-    "strike": 25850.0,
-    "side": "SELL",
-    "lots": 1,
-    "limit": 220.0,
-    "bid": 219.23391112631757,
-    "ask": 221.43726701703432
-   }
-  ]
- },
- "last_step": "2026-11-26T14:30:13+05:30",
+ "pending": null,
+ "last_step": "2026-11-26T14:32:15+05:30",
  "last_signal": {
   "asof": "2026-11-26",
   "rv_fcst": 15.532634963712344,
@@ -63,12 +12,12 @@
   "ret5": 0.026348406179437234,
   "dd20": 0.0,
   "spot_close": 25901.5,
-  "atm_iv": 0.1779154079449224,
-  "spot": 25853.19921875
+  "atm_iv": 0.18014340885607988,
+  "spot": 25847.94921875
  },
  "last_iv": null,
  "strategy": "fly_1.0_hold",
- "last_reason": "no trade: stress regime: short-vol entries blocked",
+ "last_reason": "GOVERNOR BLOCKED: outside entry window 09:45-14:30",
  "data_pending": null,
  "data_last_day": "2026-11-26"
 }
