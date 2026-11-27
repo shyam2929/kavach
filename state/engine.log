@@ -208,3 +208,4 @@
 2026-11-26 15:19:05 COMMAND approve CT3aaee -> crude training trade CT3aaee opened
 2026-11-26 17:01:26 [crude] main: no proposal (stress: crude -21.2% below 20-day high)
 2026-11-27 09:16:57 training: no proposal (outside entry window 09:45-14:30)
+2026-11-27 09:45:23 TRAINING PROPOSAL T82ead fly_1.0_hold exp 2026-12-01 credit Rs 17,098 worst case Rs 12,152 [no premium (IV 15.4 < RV fcst 15.5)]
