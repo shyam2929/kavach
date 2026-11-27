@@ -211,3 +211,11 @@
 2026-11-27 09:45:23 TRAINING PROPOSAL T82ead fly_1.0_hold exp 2026-12-01 credit Rs 17,098 worst case Rs 12,152 [no premium (IV 15.4 < RV fcst 15.5)]
 2026-11-27 10:01:38 [crude] main: no proposal (stress: crude -19.9% below 20-day high)
 2026-11-27 10:01:38 [crude] PROPOSAL CTccfd8 (training) exp 2026-12-16 credit Rs 2,253 worst case Rs 5,247 [stress: crude -19.9% below 20-day high]
+2026-11-27 10:11:48 FILLED BUY 1x P25450 @ 44.00
+2026-11-27 10:11:49 FILLED BUY 1x C26300 @ 32.97
+2026-11-27 10:11:49 FILLED SELL 1x P25900 @ 181.08
+2026-11-27 10:11:50 FILLED SELL 1x C25900 @ 156.33
+2026-11-27 10:11:48 TRAINING OPENED T82ead fly_1.0_hold exp 2026-12-01 credit Rs 16,929 worst case Rs 12,321 [no premium (IV 15.4 < RV fcst 15.5)]
+2026-11-27 10:11:48 COMMAND approve T82ead -> training trade T82ead opened
+2026-11-27 10:11:48 [crude] OPENED CTccfd8 (training) exp 2026-12-16 credit Rs 2,212 worst case Rs 5,288
+2026-11-27 10:11:48 COMMAND approve CTccfd8 -> crude training trade CTccfd8 opened

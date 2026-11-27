@@ -1,12 +1,5 @@
 [
  {
-  "ts": "2026-11-10T17:50:56+05:30",
-  "cmd": "approve",
-  "arg": "CT9bc59",
-  "result": "execution failed; legs unwound (the SELL PE 7700 leg was not filled because of a paper-broker quote bug, now fixed). No position was opened.",
-  "issue": 4
- },
- {
   "ts": "2026-11-10T17:53:12+05:30",
   "cmd": "approve",
   "arg": "CT9bc59",
@@ -96,5 +89,19 @@
   "arg": "CT3aaee",
   "result": "crude training trade CT3aaee opened",
   "issue": 20
+ },
+ {
+  "ts": "2026-11-27T10:11:48+05:30",
+  "cmd": "approve",
+  "arg": "T82ead",
+  "result": "training trade T82ead opened",
+  "issue": 21
+ },
+ {
+  "ts": "2026-11-27T10:11:48+05:30",
+  "cmd": "approve",
+  "arg": "CTccfd8",
+  "result": "crude training trade CTccfd8 opened",
+  "issue": 22
  }
 ]

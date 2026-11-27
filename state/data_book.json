@@ -91,6 +91,100 @@
   "credit": 27006.143609284292,
   "max_loss": 18493.85639071581,
   "tp_rs": 21604.914887427436,
-  "last_mtm": 4042.614610107591
+  "last_mtm": 4648.936693420921
+ },
+ {
+  "id": "T82ead",
+  "expiry": "2026-12-01",
+  "td_left": 2,
+  "strategy": "fly_1.0_hold",
+  "lots": 1,
+  "spot": 25863.05078125,
+  "atm_iv": 0.15378367988902053,
+  "gate_open": false,
+  "gate_reason": "no premium (IV 15.4 < RV fcst 15.5)",
+  "signal": {
+   "asof": "2026-11-26",
+   "rv_fcst": 15.544338245392664,
+   "stress": false,
+   "vix": 16.84000015258789,
+   "vix_ch5": 0.0784110516295553,
+   "ret5": 0.025691858054049277,
+   "dd20": 0.0,
+   "spot_close": 25884.5,
+   "atm_iv": 0.1819852014970105,
+   "spot": 25884.5
+  },
+  "opened": "2026-11-27T10:11+05:30",
+  "fills": [
+   {
+    "leg": {
+     "cp": "P",
+     "strike": 25450.0,
+     "expiry": "2026-12-01",
+     "side": "BUY",
+     "lots": 1,
+     "limit_price": 44.0,
+     "bid": 43.495233334897954,
+     "ask": 43.995233334897954,
+     "security_id": "SYN-2026-12-01-25450-P",
+     "underlying": "NIFTY",
+     "lot_size": 65
+    },
+    "price": 43.995233334897954
+   },
+   {
+    "leg": {
+     "cp": "C",
+     "strike": 26300.0,
+     "expiry": "2026-12-01",
+     "side": "BUY",
+     "lots": 1,
+     "limit_price": 33.0,
+     "bid": 32.47222793613315,
+     "ask": 32.97222793613315,
+     "security_id": "SYN-2026-12-01-26300-C",
+     "underlying": "NIFTY",
+     "lot_size": 65
+    },
+    "price": 32.97222793613315
+   },
+   {
+    "leg": {
+     "cp": "P",
+     "strike": 25900.0,
+     "expiry": "2026-12-01",
+     "side": "SELL",
+     "lots": 1,
+     "limit_price": 181.05,
+     "bid": 181.08400029036014,
+     "ask": 182.90393999177078,
+     "security_id": "SYN-2026-12-01-25900-P",
+     "underlying": "NIFTY",
+     "lot_size": 65
+    },
+    "price": 181.08400029036014
+   },
+   {
+    "leg": {
+     "cp": "C",
+     "strike": 25900.0,
+     "expiry": "2026-12-01",
+     "side": "SELL",
+     "lots": 1,
+     "limit_price": 156.3,
+     "bid": 156.325851523648,
+     "ask": 157.89696560931282,
+     "security_id": "SYN-2026-12-01-25900-C",
+     "underlying": "NIFTY",
+     "lot_size": 65
+    },
+    "price": 156.325851523648
+   }
+  ],
+  "credit": 16928.755385293505,
+  "max_loss": 12321.244614706538,
+  "tp_rs": 13543.004308234806,
+  "last_mtm": -324.1942390051777
  }
 ]
